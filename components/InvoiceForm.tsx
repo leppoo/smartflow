@@ -265,72 +265,99 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
               {formData.signature && (
                 <div className="p-4 rounded-lg bg-white border border-slate-100 space-y-3">
                   <p className="text-xs font-bold text-slate-500 uppercase">Adjust signature:</p>
-                  <div 
-                    ref={signatureContainerRef}
-                    className="border-b-2 border-slate-900 pb-2 relative overflow-hidden bg-slate-50"
-                    style={{ height: `${signatureSize + 40}px`, minHeight: '160px' }}
-                  >
-                    <Rnd
-                      default={{
-                        x: signatureHorizontalPosition,
-                        y: signatureVerticalPosition,
-                        width: 'auto',
-                        height: signatureSize
-                      }}
-                      onDragStop={(e, d) => {
-                        const newX = Math.max(-30, Math.min(30, d.x));
-                        const newY = Math.max(-30, Math.min(30, d.y));
-                        setSignatureHorizontalPosition(newX);
-                        setSignatureVerticalPosition(newY);
-                      }}
-                      onResizeStart={() => {
-                        setIsResizing(true);
-                      }}
-                      onResizeStop={(e, direction, ref, delta, position) => {
-                        const newHeight = parseInt(ref.style.height);
-                        const constrainedSize = Math.max(40, Math.min(200, newHeight));
-                        setSignatureSize(constrainedSize);
-                        setIsResizing(false);
-                      }}
-                      bounds="parent"
-                      enableResizing={{
-                        bottom: false,
-                        bottomLeft: false,
-                        bottomRight: true,
-                        left: false,
-                        right: false,
-                        top: false,
-                        topLeft: false,
-                        topRight: false
-                      }}
-                      disableDragging={false}
-                      resizeGrid={[1, 1]}
-                    >
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Left: Edit Section */}
+                    <div className="space-y-3">
                       <div 
-                        className={`cursor-move flex items-center justify-center transition-all ${isResizing ? 'ring-2 ring-indigo-500 shadow-lg shadow-indigo-300 rounded' : ''}`}
-                        style={{ height: `${signatureSize}px`, width: 'auto' }}
+                        ref={signatureContainerRef}
+                        className="border-b-2 border-slate-900 pb-2 relative overflow-visible bg-slate-50 rounded"
+                        style={{ minHeight: '200px', paddingTop: '40px', paddingBottom: '40px' }}
+                      >
+                        <Rnd
+                          default={{
+                            x: signatureHorizontalPosition,
+                            y: signatureVerticalPosition,
+                            width: 'auto',
+                            height: signatureSize
+                          }}
+                          onDragStop={(e, d) => {
+                            const newX = Math.max(-30, Math.min(30, d.x));
+                            const newY = d.y;
+                            setSignatureHorizontalPosition(newX);
+                            setSignatureVerticalPosition(newY);
+                          }}
+                          onResizeStart={() => {
+                            setIsResizing(true);
+                          }}
+                          onResizeStop={(e, direction, ref, delta, position) => {
+                            const newHeight = parseInt(ref.style.height);
+                            const constrainedSize = Math.max(40, Math.min(200, newHeight));
+                            setSignatureSize(constrainedSize);
+                            setIsResizing(false);
+                          }}
+                          enableResizing={{
+                            bottom: false,
+                            bottomLeft: false,
+                            bottomRight: true,
+                            left: false,
+                            right: false,
+                            top: false,
+                            topLeft: false,
+                            topRight: false
+                          }}
+                          disableDragging={false}
+                          resizeGrid={[1, 1]}
+                        >
+                          <div 
+                            className={`cursor-move flex items-center justify-center transition-all ${isResizing ? 'ring-2 ring-indigo-500 shadow-lg shadow-indigo-300 rounded' : ''}`}
+                            style={{ height: `${signatureSize}px`, width: 'auto' }}
+                          >
+                            <img 
+                              src={formData.signature} 
+                              alt="Signature" 
+                              style={{ 
+                                height: `${signatureSize}px`,
+                                maxWidth: '300px'
+                              }}
+                              className={`object-contain pointer-events-none select-none transition-all ${isResizing ? 'brightness-110 border-2 border-indigo-500' : 'border border-slate-300'}`}
+                              draggable="false"
+                            />
+                          </div>
+                        </Rnd>
+                      </div>
+                      
+                      <div className="text-xs text-slate-500 space-y-1 bg-slate-50 p-3 rounded">
+                        <p className="font-bold">Drag to move • Bottom-right corner to resize</p>
+                        <p className="text-[11px]">
+                          Size: <span className="font-black text-slate-700">{signatureSize}px</span>
+                        </p>
+                        <p className="text-[11px]">
+                          Position: <span className="font-black text-slate-700">X: {signatureHorizontalPosition}px, Y: {signatureVerticalPosition}px</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right: Preview Section */}
+                    <div className="space-y-3 bg-white border border-slate-200 p-4 rounded-lg">
+                      <p className="text-xs font-bold text-slate-500 uppercase">Preview:</p>
+                      <div 
+                        className="border-b-2 border-slate-900 mb-2 flex items-center justify-center overflow-visible"
+                        style={{ minHeight: '100px' }}
                       >
                         <img 
                           src={formData.signature} 
-                          alt="Signature" 
+                          alt="Signature Preview" 
                           style={{ 
                             height: `${signatureSize}px`,
-                            maxWidth: '300px'
+                            transform: `translate(${signatureHorizontalPosition}px, ${signatureVerticalPosition}px)`
                           }}
-                          className={`object-contain pointer-events-none select-none transition-all ${isResizing ? 'brightness-110 border-2 border-indigo-500' : 'border border-slate-300'}`}
+                          className="object-contain"
                           draggable="false"
                         />
                       </div>
-                    </Rnd>
-                  </div>
-                  <p className="text-[9px] text-slate-400 uppercase font-bold">Authorized Signature</p>
-                  
-                  <div className="text-xs text-slate-500 space-y-1 bg-slate-50 p-3 rounded">
-                    <p className="font-bold">Drag to move • Bottom-right corner to resize</p>
-                    <p className="text-[11px]">
-                      Size: <span className="font-black text-slate-700">{signatureSize}px</span> | 
-                      Position: <span className="font-black text-slate-700">X: {signatureHorizontalPosition}px, Y: {signatureVerticalPosition}px</span>
-                    </p>
+                      <p className="text-[9px] text-slate-400 uppercase font-bold">Authorized Signature</p>
+                    </div>
                   </div>
 
                   <button
