@@ -1,0 +1,5 @@
+{
+  "name": "SmartFlow Invoice",
+  "description": "A responsive, professional invoice generator with smart AI-assisted item extraction and history tracking.",
+  "requestFramePermissions": []
+}
