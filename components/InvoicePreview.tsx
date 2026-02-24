@@ -147,7 +147,7 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
                   alt="Signature" 
                   style={{ 
                     height: `${invoice.signatureSize || 80}px`,
-                    transform: `translateY(${invoice.signatureVerticalPosition || 0}px)`
+                    transform: `translate(${invoice.signatureHorizontalPosition || 0}px, ${invoice.signatureVerticalPosition || 0}px)`
                   }}
                   className="object-contain"
                 />

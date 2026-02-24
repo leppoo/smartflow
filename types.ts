@@ -41,6 +41,7 @@ export interface Invoice {
   signature?: string;
   signatureSize?: number;
   signatureVerticalPosition?: number;
+  signatureHorizontalPosition?: number;
 }
 
 export type View = 'dashboard' | 'list' | 'create' | 'edit' | 'view' | 'profile' | 'banks';

@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { Rnd } from 'react-rnd';
 import { Invoice, LineItem, BankDetail } from '../types';
 
 interface Props {
@@ -12,6 +13,9 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
   const [formData, setFormData] = useState<Invoice>(invoice);
   const [signatureSize, setSignatureSize] = useState<number>(invoice.signatureSize || 80);
   const [signatureVerticalPosition, setSignatureVerticalPosition] = useState<number>(invoice.signatureVerticalPosition || 0);
+  const [signatureHorizontalPosition, setSignatureHorizontalPosition] = useState<number>(invoice.signatureHorizontalPosition || 0);
+  const [isResizing, setIsResizing] = useState(false);
+  const signatureContainerRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -75,6 +79,24 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
     setSignatureVerticalPosition(0);
   };
 
+  const handleSignatureDragStart = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStartX(e.clientX - signatureHorizontalPosition);
+    setDragStartY(e.clientY - signatureVerticalPosition);
+  };
+
+  const handleSignatureResizeStart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsResizing(true);
+    setResizeStartY(e.clientY);
+  };
+
+  const handleSignatureWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const newSize = signatureSize - (e.deltaY > 0 ? 5 : -5);
+    setSignatureSize(Math.max(40, Math.min(200, newSize)));
+  };
+
   const subtotal = formData.items.reduce((sum, item) => sum + item.amount, 0);
   const taxAmount = subtotal * (formData.taxRate / 100);
   const total = subtotal + taxAmount;
@@ -94,7 +116,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
           <button onClick={onCancel} className="px-6 py-2 rounded-xl border border-slate-200 hover:bg-white text-slate-600 font-medium transition-all">
             Cancel
           </button>
-          <button onClick={() => onSave({ ...formData, signatureSize, signatureVerticalPosition })} className="px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-100">
+          <button onClick={() => onSave({ ...formData, signatureSize, signatureVerticalPosition, signatureHorizontalPosition })} className="px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-100">
             Save Invoice
           </button>
         </div>
@@ -239,75 +261,86 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                 </div>
               </label>
 
-              {/* Preview with Size Adjustment */}
+              {/* Edit in Invoice Preview */}
               {formData.signature && (
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Size Control */}
-                  <div className="p-4 rounded-lg bg-slate-50 border border-slate-100 space-y-4">
-                    <div className="flex items-center justify-center h-32 bg-white rounded border border-slate-200">
-                      <img 
-                        src={formData.signature} 
-                        alt="Signature preview" 
-                        style={{ height: `${signatureSize}px` }}
-                        className="object-contain"
-                      />
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase block">
-                          Size: {signatureSize}px
-                        </label>
-                        <input
-                          type="range"
-                          min="40"
-                          max="200"
-                          value={signatureSize}
-                          onChange={(e) => setSignatureSize(parseInt(e.target.value))}
-                          className="w-full"
+                <div className="p-4 rounded-lg bg-white border border-slate-100 space-y-3">
+                  <p className="text-xs font-bold text-slate-500 uppercase">Adjust signature:</p>
+                  <div 
+                    ref={signatureContainerRef}
+                    className="border-b-2 border-slate-900 pb-2 relative overflow-hidden bg-slate-50"
+                    style={{ height: `${signatureSize + 40}px`, minHeight: '160px' }}
+                  >
+                    <Rnd
+                      default={{
+                        x: signatureHorizontalPosition,
+                        y: signatureVerticalPosition,
+                        width: 'auto',
+                        height: signatureSize
+                      }}
+                      onDragStop={(e, d) => {
+                        const newX = Math.max(-30, Math.min(30, d.x));
+                        const newY = Math.max(-30, Math.min(30, d.y));
+                        setSignatureHorizontalPosition(newX);
+                        setSignatureVerticalPosition(newY);
+                      }}
+                      onResizeStart={() => {
+                        setIsResizing(true);
+                      }}
+                      onResizeStop={(e, direction, ref, delta, position) => {
+                        const newHeight = parseInt(ref.style.height);
+                        const constrainedSize = Math.max(40, Math.min(200, newHeight));
+                        setSignatureSize(constrainedSize);
+                        setIsResizing(false);
+                      }}
+                      bounds="parent"
+                      enableResizing={{
+                        bottom: false,
+                        bottomLeft: false,
+                        bottomRight: true,
+                        left: false,
+                        right: false,
+                        top: false,
+                        topLeft: false,
+                        topRight: false
+                      }}
+                      disableDragging={false}
+                      resizeGrid={[1, 1]}
+                    >
+                      <div 
+                        className={`cursor-move flex items-center justify-center transition-all ${isResizing ? 'ring-2 ring-indigo-500 shadow-lg shadow-indigo-300 rounded' : ''}`}
+                        style={{ height: `${signatureSize}px`, width: 'auto' }}
+                      >
+                        <img 
+                          src={formData.signature} 
+                          alt="Signature" 
+                          style={{ 
+                            height: `${signatureSize}px`,
+                            maxWidth: '300px'
+                          }}
+                          className={`object-contain pointer-events-none select-none transition-all ${isResizing ? 'brightness-110 border-2 border-indigo-500' : 'border border-slate-300'}`}
+                          draggable="false"
                         />
                       </div>
-
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase block">
-                          Vertical Position: {signatureVerticalPosition}px
-                        </label>
-                        <input
-                          type="range"
-                          min="-20"
-                          max="20"
-                          value={signatureVerticalPosition}
-                          onChange={(e) => setSignatureVerticalPosition(parseInt(e.target.value))}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
+                    </Rnd>
+                  </div>
+                  <p className="text-[9px] text-slate-400 uppercase font-bold">Authorized Signature</p>
+                  
+                  <div className="text-xs text-slate-500 space-y-1 bg-slate-50 p-3 rounded">
+                    <p className="font-bold">Drag to move • Bottom-right corner to resize</p>
+                    <p className="text-[11px]">
+                      Size: <span className="font-black text-slate-700">{signatureSize}px</span> | 
+                      Position: <span className="font-black text-slate-700">X: {signatureHorizontalPosition}px, Y: {signatureVerticalPosition}px</span>
+                    </p>
                   </div>
 
-                  {/* Invoice Preview */}
-                  <div className="p-4 rounded-lg bg-white border border-slate-100 space-y-2">
-                    <p className="text-xs font-bold text-slate-500 uppercase mb-3">How it looks in invoice:</p>
-                    <div className="border-b-2 border-slate-900 pb-2 flex items-center justify-center" style={{ height: `${signatureSize + 20}px` }}>
-                      <img 
-                        src={formData.signature} 
-                        alt="Signature in invoice" 
-                        style={{ height: `${signatureSize}px`, transform: `translateY(${signatureVerticalPosition}px)` }}
-                        className="object-contain"
-                      />
-                    </div>
-                    <p className="text-[9px] text-slate-400 uppercase font-bold">Authorized Signature</p>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={clearSignature}
+                    className="w-full px-3 py-2 rounded text-slate-600 hover:text-red-500 font-medium text-sm transition-colors bg-slate-100 border border-slate-200 hover:border-red-300"
+                  >
+                    Remove Signature
+                  </button>
                 </div>
-              )}
-
-              {formData.signature && (
-                <button
-                  type="button"
-                  onClick={clearSignature}
-                  className="w-full px-3 py-2 rounded text-slate-600 hover:text-red-500 font-medium text-sm transition-colors bg-white border border-slate-200 hover:border-red-300"
-                >
-                  Remove Signature
-                </button>
               )}
             </div>
           </div>
@@ -319,7 +352,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
 
       <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40">
         <button onClick={onCancel} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold">Cancel</button>
-        <button onClick={() => onSave({ ...formData, signatureSize, signatureVerticalPosition })} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">Save Invoice</button>
+        <button onClick={() => onSave({ ...formData, signatureSize, signatureVerticalPosition, signatureHorizontalPosition })} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">Save Invoice</button>
       </div>
     </div>
   );
