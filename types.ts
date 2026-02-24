@@ -38,6 +38,9 @@ export interface Invoice {
   status: 'draft' | 'sent' | 'paid';
   createdAt: number;
   banks: BankDetail[];
+  signature?: string;
+  signatureSize?: number;
+  signatureVerticalPosition?: number;
 }
 
 export type View = 'dashboard' | 'list' | 'create' | 'edit' | 'view' | 'profile' | 'banks';

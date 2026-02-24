@@ -39,7 +39,7 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
       <div className="grid grid-cols-2 gap-10 mb-12">
         <div>
           <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1 inline-block">Bill To</p>
-          <p className="font-bold text-xl uppercase mb-1 leading-tight">{invoice.clientName || 'Client Name'}</p>
+          <p className="font-bold text-1xl uppercase mb-1 leading-tight">{invoice.clientName || 'Client Name'}</p>
           <p className="text-slate-500 whitespace-pre-line text-[11px] leading-relaxed pr-8">{invoice.clientAddress}</p>
         </div>
         <div className="text-right">
@@ -78,13 +78,13 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
             ))}
           </tbody>
           <tfoot>
-            <tr>
+            {/* <tr>
               <td colSpan={2} className="pt-8 pb-2 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider">Subtotal</td>
               <td className="pt-8 pb-2 text-right font-bold text-slate-900">{formatCurrency(subtotal)}</td>
-            </tr>
+            </tr> */}
             <tr className="border-t-2 border-slate-900">
               <td colSpan={2} className="py-5 font-black text-base uppercase tracking-widest">Total Amount Due</td>
-              <td className="py-5 text-right font-black text-2xl text-indigo-600">{formatCurrency(total)}</td>
+              <td className="py-5 text-right font-black text-1xl text-indigo-600">{formatCurrency(total)}</td>
             </tr>
           </tfoot>
         </table>
@@ -116,7 +116,7 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
                   
                   <div className="text-right">
                     <span className="text-[10px] text-slate-400 uppercase font-black block mb-1">Account Number</span>
-                    <span className="font-black text-indigo-600 tracking-widest text-3xl leading-none">
+                    <span className="font-black text-indigo-600 tracking-widest text-1xl leading-none">
                       {bank.accountNo}
                     </span>
                   </div>
@@ -140,8 +140,18 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
 
         <div className="flex justify-between items-end border-t border-slate-100 pt-8">
           <div className="w-60">
-            <div className="border-b-2 border-slate-900 mb-2 h-10 flex items-end">
-              {/* Signature Line */}
+            <div className="border-b-2 border-slate-900 mb-2 flex items-center justify-center">
+              {invoice.signature && (
+                <img 
+                  src={invoice.signature} 
+                  alt="Signature" 
+                  style={{ 
+                    height: `${invoice.signatureSize || 80}px`,
+                    transform: `translateY(${invoice.signatureVerticalPosition || 0}px)`
+                  }}
+                  className="object-contain"
+                />
+              )}
             </div>
             <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Authorized Signature</p>
             <p className="font-black text-slate-900 text-xs mt-1 uppercase">{invoice.senderName}</p>

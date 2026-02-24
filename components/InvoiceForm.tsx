@@ -10,6 +10,8 @@ interface Props {
 
 export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
   const [formData, setFormData] = useState<Invoice>(invoice);
+  const [signatureSize, setSignatureSize] = useState<number>(invoice.signatureSize || 80);
+  const [signatureVerticalPosition, setSignatureVerticalPosition] = useState<number>(invoice.signatureVerticalPosition || 0);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -55,6 +57,24 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
     setFormData(prev => ({ ...prev, banks: prev.banks.filter(b => b.id !== id) }));
   };
 
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageData = event.target?.result as string;
+      setFormData(prev => ({ ...prev, signature: imageData }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearSignature = () => {
+    setFormData(prev => ({ ...prev, signature: undefined }));
+    setSignatureSize(80);
+    setSignatureVerticalPosition(0);
+  };
+
   const subtotal = formData.items.reduce((sum, item) => sum + item.amount, 0);
   const taxAmount = subtotal * (formData.taxRate / 100);
   const total = subtotal + taxAmount;
@@ -74,7 +94,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
           <button onClick={onCancel} className="px-6 py-2 rounded-xl border border-slate-200 hover:bg-white text-slate-600 font-medium transition-all">
             Cancel
           </button>
-          <button onClick={() => onSave(formData)} className="px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-100">
+          <button onClick={() => onSave({ ...formData, signatureSize, signatureVerticalPosition })} className="px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-100">
             Save Invoice
           </button>
         </div>
@@ -203,6 +223,95 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
         </div>
 
         <div className="pt-8 border-t border-slate-100">
+          <div className="mb-8">
+            <label className="text-xs font-bold text-slate-500 uppercase block mb-4">Signature</label>
+            <div className="space-y-4">
+              {/* Upload Section */}
+              <label className="flex-1 relative cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSignatureUpload}
+                  className="hidden"
+                />
+                <div className="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50 transition-all text-center">
+                  📤 Upload Signature Image
+                </div>
+              </label>
+
+              {/* Preview with Size Adjustment */}
+              {formData.signature && (
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Size Control */}
+                  <div className="p-4 rounded-lg bg-slate-50 border border-slate-100 space-y-4">
+                    <div className="flex items-center justify-center h-32 bg-white rounded border border-slate-200">
+                      <img 
+                        src={formData.signature} 
+                        alt="Signature preview" 
+                        style={{ height: `${signatureSize}px` }}
+                        className="object-contain"
+                      />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase block">
+                          Size: {signatureSize}px
+                        </label>
+                        <input
+                          type="range"
+                          min="40"
+                          max="200"
+                          value={signatureSize}
+                          onChange={(e) => setSignatureSize(parseInt(e.target.value))}
+                          className="w-full"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase block">
+                          Vertical Position: {signatureVerticalPosition}px
+                        </label>
+                        <input
+                          type="range"
+                          min="-20"
+                          max="20"
+                          value={signatureVerticalPosition}
+                          onChange={(e) => setSignatureVerticalPosition(parseInt(e.target.value))}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Invoice Preview */}
+                  <div className="p-4 rounded-lg bg-white border border-slate-100 space-y-2">
+                    <p className="text-xs font-bold text-slate-500 uppercase mb-3">How it looks in invoice:</p>
+                    <div className="border-b-2 border-slate-900 pb-2 flex items-center justify-center" style={{ height: `${signatureSize + 20}px` }}>
+                      <img 
+                        src={formData.signature} 
+                        alt="Signature in invoice" 
+                        style={{ height: `${signatureSize}px`, transform: `translateY(${signatureVerticalPosition}px)` }}
+                        className="object-contain"
+                      />
+                    </div>
+                    <p className="text-[9px] text-slate-400 uppercase font-bold">Authorized Signature</p>
+                  </div>
+                </div>
+              )}
+
+              {formData.signature && (
+                <button
+                  type="button"
+                  onClick={clearSignature}
+                  className="w-full px-3 py-2 rounded text-slate-600 hover:text-red-500 font-medium text-sm transition-colors bg-white border border-slate-200 hover:border-red-300"
+                >
+                  Remove Signature
+                </button>
+              )}
+            </div>
+          </div>
+
           <label className="text-xs font-bold text-slate-500 uppercase">Notes</label>
           <textarea name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Additional details..." className="w-full rounded-xl border-slate-200 text-sm h-24" />
         </div>
@@ -210,7 +319,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
 
       <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40">
         <button onClick={onCancel} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold">Cancel</button>
-        <button onClick={() => onSave(formData)} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">Save Invoice</button>
+        <button onClick={() => onSave({ ...formData, signatureSize, signatureVerticalPosition })} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">Save Invoice</button>
       </div>
     </div>
   );
