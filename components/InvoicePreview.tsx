@@ -19,7 +19,7 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
       {/* Header Area */}
       <div className="flex justify-between items-start border-b-2 border-slate-900 pb-8 mb-10">
         <div className="flex-1">
-          <h1 className="text-5xl font-black text-indigo-600 tracking-tighter mb-1">INVOICE</h1>
+          <h1 className="text-5xl font-black text-primary-600 tracking-tighter mb-1">INVOICE</h1>
           <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">{invoice.invoiceNumber}</p>
         </div>
         <div className="text-right flex-1">
@@ -78,7 +78,7 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
             </tr> */}
             <tr className="border-t-2 border-slate-900">
               <td colSpan={2} className="py-5 font-black text-base uppercase tracking-widest">Total Amount Due</td>
-              <td className="py-5 text-right font-black text-1xl text-indigo-600">{formatCurrency(total)}</td>
+              <td className="py-5 text-right font-black text-1xl text-primary-600">{formatCurrency(total)}</td>
             </tr>
           </tfoot>
         </table>
@@ -92,7 +92,7 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
             {invoice.banks.map((bank) => (
               <div key={bank.id} className="bg-slate-50 p-6 rounded-2xl border border-slate-200/50 flex flex-col gap-4 shadow-sm">
                 <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                  <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{bank.paymentMethod}</span>
+                  <span className="text-[10px] font-black text-primary-500 uppercase tracking-widest">{bank.paymentMethod}</span>
                   <span className="text-[9px] text-slate-400 uppercase font-bold">Please use account below</span>
                 </div>
                 
@@ -110,7 +110,7 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
                   
                   <div className="text-right">
                     <span className="text-[10px] text-slate-400 uppercase font-black block mb-1">Account Number</span>
-                    <span className="font-black text-indigo-600 tracking-widest text-1xl leading-none">
+                    <span className="font-black text-primary-600 tracking-widest text-1xl leading-none">
                       {bank.accountNo}
                     </span>
                   </div>
@@ -126,7 +126,7 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
         {invoice.notes && (
           <div className="mb-10 notes-section">
             <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-2">Terms & Notes</p>
-            <p className="text-slate-500 text-[10px] leading-relaxed whitespace-pre-line bg-indigo-50/30 p-4 rounded-xl italic">
+            <p className="text-slate-500 text-[10px] leading-relaxed whitespace-pre-line bg-primary-50/30 p-4 rounded-xl italic">
               {invoice.notes}
             </p>
           </div>

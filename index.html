@@ -5,10 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartFlow Invoice</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50:  'rgb(var(--color-primary-50) / <alpha-value>)',
+              100: 'rgb(var(--color-primary-100) / <alpha-value>)',
+              200: 'rgb(var(--color-primary-200) / <alpha-value>)',
+              300: 'rgb(var(--color-primary-300) / <alpha-value>)',
+              400: 'rgb(var(--color-primary-400) / <alpha-value>)',
+              500: 'rgb(var(--color-primary-500) / <alpha-value>)',
+              600: 'rgb(var(--color-primary-600) / <alpha-value>)',
+              700: 'rgb(var(--color-primary-700) / <alpha-value>)',
+              800: 'rgb(var(--color-primary-800) / <alpha-value>)',
+              900: 'rgb(var(--color-primary-900) / <alpha-value>)',
+            },
+            accent: {
+              50:  'rgb(var(--color-accent-50) / <alpha-value>)',
+              100: 'rgb(var(--color-accent-100) / <alpha-value>)',
+              200: 'rgb(var(--color-accent-200) / <alpha-value>)',
+              300: 'rgb(var(--color-accent-300) / <alpha-value>)',
+              400: 'rgb(var(--color-accent-400) / <alpha-value>)',
+              500: 'rgb(var(--color-accent-500) / <alpha-value>)',
+              600: 'rgb(var(--color-accent-600) / <alpha-value>)',
+              700: 'rgb(var(--color-accent-700) / <alpha-value>)',
+              800: 'rgb(var(--color-accent-800) / <alpha-value>)',
+              900: 'rgb(var(--color-accent-900) / <alpha-value>)',
+            },
+          }
+        }
+      }
+    }
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* Default theme CSS variables (Indigo + Violet) */
+    :root {
+      --color-primary-50: 238 242 255;
+      --color-primary-100: 224 231 255;
+      --color-primary-200: 199 210 254;
+      --color-primary-300: 165 180 252;
+      --color-primary-400: 129 140 248;
+      --color-primary-500: 99 102 241;
+      --color-primary-600: 79 70 229;
+      --color-primary-700: 67 56 202;
+      --color-primary-800: 55 48 163;
+      --color-primary-900: 49 46 129;
+      --color-accent-50: 245 243 255;
+      --color-accent-100: 237 233 254;
+      --color-accent-200: 221 214 254;
+      --color-accent-300: 196 181 253;
+      --color-accent-400: 167 139 250;
+      --color-accent-500: 139 92 246;
+      --color-accent-600: 124 58 237;
+      --color-accent-700: 109 40 217;
+      --color-accent-800: 91 33 182;
+      --color-accent-900: 76 29 149;
+    }
+
     body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
-    
+
     /* Screen Styles */
     .invoice-container {
       background: white;
@@ -21,6 +79,29 @@
 
     /* Print Styles */
     @media print {
+      /* Freeze theme to Default for consistent printed invoices */
+      :root {
+        --color-primary-50: 238 242 255 !important;
+        --color-primary-100: 224 231 255 !important;
+        --color-primary-200: 199 210 254 !important;
+        --color-primary-300: 165 180 252 !important;
+        --color-primary-400: 129 140 248 !important;
+        --color-primary-500: 99 102 241 !important;
+        --color-primary-600: 79 70 229 !important;
+        --color-primary-700: 67 56 202 !important;
+        --color-primary-800: 55 48 163 !important;
+        --color-primary-900: 49 46 129 !important;
+        --color-accent-50: 245 243 255 !important;
+        --color-accent-100: 237 233 254 !important;
+        --color-accent-200: 221 214 254 !important;
+        --color-accent-300: 196 181 253 !important;
+        --color-accent-400: 167 139 250 !important;
+        --color-accent-500: 139 92 246 !important;
+        --color-accent-600: 124 58 237 !important;
+        --color-accent-700: 109 40 217 !important;
+        --color-accent-800: 91 33 182 !important;
+        --color-accent-900: 76 29 149 !important;
+      }
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -73,8 +154,28 @@
   }
 }
 </script>
+<!-- Apply saved theme before React mounts to prevent flash -->
+<script>
+  (function() {
+    var THEMES = {
+      'default': { 'primary-50':'238 242 255','primary-100':'224 231 255','primary-200':'199 210 254','primary-300':'165 180 252','primary-400':'129 140 248','primary-500':'99 102 241','primary-600':'79 70 229','primary-700':'67 56 202','primary-800':'55 48 163','primary-900':'49 46 129','accent-50':'245 243 255','accent-100':'237 233 254','accent-200':'221 214 254','accent-300':'196 181 253','accent-400':'167 139 250','accent-500':'139 92 246','accent-600':'124 58 237','accent-700':'109 40 217','accent-800':'91 33 182','accent-900':'76 29 149' },
+      'navy-emerald': { 'primary-50':'238 241 248','primary-100':'217 223 240','primary-200':'179 191 225','primary-300':'141 159 210','primary-400':'103 127 195','primary-500':'45 78 160','primary-600':'31 58 138','primary-700':'25 47 110','primary-800':'19 35 83','primary-900':'13 24 55','accent-50':'236 253 245','accent-100':'209 250 229','accent-200':'167 243 208','accent-300':'110 231 183','accent-400':'52 211 153','accent-500':'16 185 129','accent-600':'5 150 105','accent-700':'4 120 87','accent-800':'6 95 70','accent-900':'6 78 59' },
+      'slate-amber': { 'primary-50':'248 250 252','primary-100':'241 245 249','primary-200':'226 232 240','primary-300':'203 213 225','primary-400':'148 163 184','primary-500':'100 116 139','primary-600':'71 85 105','primary-700':'51 65 85','primary-800':'30 41 59','primary-900':'15 23 42','accent-50':'255 251 235','accent-100':'254 243 199','accent-200':'253 230 138','accent-300':'252 211 77','accent-400':'251 191 36','accent-500':'245 158 11','accent-600':'217 119 6','accent-700':'180 83 9','accent-800':'146 64 14','accent-900':'120 53 15' },
+      'indigo-rose': { 'primary-50':'238 242 255','primary-100':'224 231 255','primary-200':'199 210 254','primary-300':'165 180 252','primary-400':'129 140 248','primary-500':'99 102 241','primary-600':'79 70 229','primary-700':'67 56 202','primary-800':'55 48 163','primary-900':'49 46 129','accent-50':'255 241 242','accent-100':'255 228 230','accent-200':'254 205 211','accent-300':'253 164 175','accent-400':'251 113 133','accent-500':'244 63 94','accent-600':'225 29 72','accent-700':'190 18 60','accent-800':'159 18 57','accent-900':'136 19 55' },
+      'teal-violet': { 'primary-50':'240 253 250','primary-100':'204 251 241','primary-200':'153 246 228','primary-300':'94 234 212','primary-400':'45 212 191','primary-500':'20 184 166','primary-600':'13 148 136','primary-700':'15 118 110','primary-800':'17 94 89','primary-900':'19 78 74','accent-50':'245 243 255','accent-100':'237 233 254','accent-200':'221 214 254','accent-300':'196 181 253','accent-400':'167 139 250','accent-500':'139 92 246','accent-600':'124 58 237','accent-700':'109 40 217','accent-800':'91 33 182','accent-900':'76 29 149' }
+    };
+    var saved = localStorage.getItem('smartflow_theme');
+    if (saved && THEMES[saved]) {
+      var colors = THEMES[saved];
+      var root = document.documentElement;
+      for (var key in colors) {
+        root.style.setProperty('--color-' + key, colors[key]);
+      }
+    }
+  })();
+</script>
 </head>
-<body class="bg-slate-50 text-slate-900">
+<body class="bg-[#F8F9FB] text-[#1F2937]">
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

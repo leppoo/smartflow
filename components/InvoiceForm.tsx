@@ -128,7 +128,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
           <button onClick={onCancel} className="px-6 py-2 rounded-xl border border-slate-200 hover:bg-white text-slate-600 font-medium transition-all">
             Cancel
           </button>
-          <button onClick={handleSave} className="px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-100">
+          <button onClick={handleSave} className="px-6 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold transition-all shadow-lg shadow-primary-100">
             Save Invoice
           </button>
         </div>
@@ -193,11 +193,11 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
              <div className="space-y-4">
                 <div className="flex justify-between items-center">
                    <h4 className="text-xs font-bold text-slate-500 uppercase">Payment Accounts</h4>
-                   <button onClick={addBank} className="text-indigo-600 text-xs font-bold">+ Add</button>
+                   <button onClick={addBank} className="text-primary-600 text-xs font-bold">+ Add</button>
                 </div>
                 <div className="space-y-3">
                   {formData.banks.map((bank) => (
-                    <div key={bank.id} className="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 relative group">
+                    <div key={bank.id} className="p-4 rounded-xl bg-primary-50/50 border border-primary-100 relative group">
                       <button onClick={() => removeBank(bank.id)} className="absolute top-2 right-2 text-slate-300 hover:text-red-500">×</button>
                       <div className="grid grid-cols-2 gap-2">
                         <input value={bank.bankName} onChange={(e) => handleBankChange(bank.id, 'bankName', e.target.value)} placeholder="Bank Name" className="text-xs rounded border-slate-100" />
@@ -214,7 +214,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold text-slate-900">Line Items</h3>
-            <button onClick={addItem} className="text-indigo-600 font-bold text-sm">+ Add Item</button>
+            <button onClick={addItem} className="text-primary-600 font-bold text-sm">+ Add Item</button>
           </div>
 
           <div className="overflow-x-auto">
@@ -246,9 +246,9 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                 ))}
               </tbody>
               <tfoot>
-                <tr className="bg-indigo-50/50">
-                  <td colSpan={2} className="py-4 px-4 font-bold text-indigo-900">Total Amount</td>
-                  <td className="py-4 px-2 font-black text-indigo-600 text-lg text-right">
+                <tr className="bg-primary-50/50">
+                  <td colSpan={2} className="py-4 px-4 font-bold text-primary-900">Total Amount</td>
+                  <td className="py-4 px-2 font-black text-primary-600 text-lg text-right">
                     {formatCurrency(total, formData.currency)}
                   </td>
                   <td></td>
@@ -325,7 +325,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                           resizeGrid={[1, 1]}
                         >
                           <div 
-                            className={`cursor-move flex items-center justify-center transition-all ${isResizing ? 'ring-2 ring-indigo-500 shadow-lg shadow-indigo-300 rounded' : ''}`}
+                            className={`cursor-move flex items-center justify-center transition-all ${isResizing ? 'ring-2 ring-primary-500 shadow-lg shadow-primary-300 rounded' : ''}`}
                             style={{ height: `${signatureSize}px`, width: 'auto' }}
                           >
                             <img 
@@ -335,7 +335,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                                 height: `${signatureSize}px`,
                                 maxWidth: '300px'
                               }}
-                              className={`object-contain pointer-events-none select-none transition-all ${isResizing ? 'brightness-110 border-2 border-indigo-500' : 'border border-slate-300'}`}
+                              className={`object-contain pointer-events-none select-none transition-all ${isResizing ? 'brightness-110 border-2 border-primary-500' : 'border border-slate-300'}`}
                               draggable="false"
                             />
                           </div>
@@ -394,7 +394,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
 
       <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40">
         <button onClick={onCancel} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold">Cancel</button>
-        <button onClick={handleSave} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">Save Invoice</button>
+        <button onClick={handleSave} className="flex-1 py-3 rounded-xl bg-primary-600 text-white font-bold">Save Invoice</button>
       </div>
     </div>
   );

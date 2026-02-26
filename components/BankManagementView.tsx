@@ -51,7 +51,7 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
         </div>
         <button 
           onClick={addBank}
-          className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+          className="bg-primary-600 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-primary-700 transition-all shadow-lg shadow-primary-100"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"/></svg>
           Add Account
@@ -66,25 +66,25 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
              </div>
              <h3 className="text-lg font-bold text-slate-900">No bank accounts yet</h3>
              <p className="text-slate-500 max-w-xs mx-auto mb-6 text-sm">Start by adding your first payment account to show on invoices.</p>
-             <button onClick={addBank} className="text-indigo-600 font-bold hover:underline">Add one now</button>
+             <button onClick={addBank} className="text-primary-600 font-bold hover:underline">Add one now</button>
           </div>
         ) : (
           <div className="space-y-3">
             {localBanks.map((bank, index) => {
               const isExpanded = expandedId === bank.id;
               return (
-                <div key={bank.id} className={`bg-white rounded-2xl border transition-all duration-200 ${isExpanded ? 'border-indigo-200 shadow-md ring-1 ring-indigo-50' : 'border-slate-100 shadow-sm hover:border-slate-200'}`}>
+                <div key={bank.id} className={`bg-white rounded-2xl border transition-all duration-200 ${isExpanded ? 'border-primary-200 shadow-md ring-1 ring-primary-50' : 'border-slate-100 shadow-sm hover:border-slate-200'}`}>
                   {/* Accordion Header */}
                   <button 
                     onClick={() => toggleExpand(bank.id)}
                     className="w-full px-6 py-4 flex items-center justify-between text-left group"
                   >
                     <div className="flex items-center gap-4 overflow-hidden">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isExpanded ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200'}`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isExpanded ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200'}`}>
                         <span className="font-black text-sm">{index + 1}</span>
                       </div>
                       <div className="truncate">
-                        <p className={`font-bold transition-colors ${isExpanded ? 'text-indigo-600' : 'text-slate-700'}`}>
+                        <p className={`font-bold transition-colors ${isExpanded ? 'text-primary-600' : 'text-slate-700'}`}>
                           {bank.bankName || 'New Account'}
                         </p>
                         <p className="text-xs text-slate-400 font-mono truncate">{bank.accountNo || 'No account number set'}</p>
@@ -115,7 +115,7 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
                             value={bank.paymentMethod}
                             onChange={(e) => handleBankChange(bank.id, 'paymentMethod', e.target.value)}
                             placeholder="e.g. Bank Transfer"
-                            className="w-full rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 text-sm"
+                            className="w-full rounded-xl border-slate-200 focus:ring-primary-500 focus:border-primary-500 p-3 text-sm"
                           />
                         </div>
                         <div className="space-y-1">
@@ -125,7 +125,7 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
                             value={bank.bankName}
                             onChange={(e) => handleBankChange(bank.id, 'bankName', e.target.value)}
                             placeholder="e.g. Maybank, PayPal, etc."
-                            className="w-full rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 text-sm font-bold uppercase"
+                            className="w-full rounded-xl border-slate-200 focus:ring-primary-500 focus:border-primary-500 p-3 text-sm font-bold uppercase"
                           />
                         </div>
                         <div className="space-y-1">
@@ -135,7 +135,7 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
                             value={bank.accountName}
                             onChange={(e) => handleBankChange(bank.id, 'accountName', e.target.value)}
                             placeholder="Name as it appears in bank"
-                            className="w-full rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 text-sm font-medium uppercase"
+                            className="w-full rounded-xl border-slate-200 focus:ring-primary-500 focus:border-primary-500 p-3 text-sm font-medium uppercase"
                           />
                         </div>
                         <div className="space-y-1">
@@ -145,7 +145,7 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
                             value={bank.accountNo}
                             onChange={(e) => handleBankChange(bank.id, 'accountNo', e.target.value)}
                             placeholder="e.g. 1234567890"
-                            className="w-full rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 p-3 text-sm font-mono font-bold"
+                            className="w-full rounded-xl border-slate-200 focus:ring-primary-500 focus:border-primary-500 p-3 text-sm font-mono font-bold"
                           />
                         </div>
                       </div>
@@ -166,7 +166,7 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
           </button>
           <button 
             onClick={() => onSave(localBanks)}
-            className="px-8 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:scale-[1.02] transition-all"
+            className="px-8 py-3 rounded-xl bg-primary-600 text-white font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 hover:scale-[1.02] transition-all"
           >
             Update & Save Accounts
           </button>
