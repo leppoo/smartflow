@@ -51,19 +51,19 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
         <table className="w-full text-left">
           <thead>
             <tr className="border-b-2 border-slate-900">
-              <th className="py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Description</th>
-              <th className="py-3 w-32 text-[10px] font-black text-slate-400 uppercase tracking-widest">Period</th>
+              <th className="py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest" style={{ maxWidth: '55%' }}>Description</th>
+              <th className="py-3 w-32 text-[10px] font-black text-slate-400 uppercase tracking-widest pl-6">Period</th>
               <th className="py-3 w-32 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount ({invoice.currency})</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {(invoice.items || []).map((item) => (
               <tr key={item.id}>
-                <td className="py-5">
-                  <p className="font-bold text-sm text-slate-800 uppercase">{item.description || 'Service/Product'}</p>
+                <td className="py-5 pr-6" style={{ maxWidth: '280px' }}>
+                  <p className="font-bold text-sm text-slate-800 uppercase break-words">{item.description || 'Service/Product'}</p>
                 </td>
-                <td className="py-5">
-                  <p className="text-slate-400 text-[11px] font-medium uppercase">{item.period || '-'}</p>
+                <td className="py-5 pl-6">
+                  <p className="text-slate-400 text-[11px] font-medium uppercase whitespace-nowrap">{item.period || '-'}</p>
                 </td>
                 <td className="py-5 text-right font-black text-sm text-slate-900">
                   {formatCurrency(item.amount)}
