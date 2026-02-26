@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Invoice } from '../types';
+import { formatCurrency, calculateTotal } from '../utils/invoice';
 
 interface Props {
   invoices: Invoice[];
@@ -14,9 +15,7 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
   
   let totalRevenue = 0;
   invoices.forEach(inv => {
-    const subtotal = inv.items.reduce((sum, item) => sum + item.amount, 0);
-    const total = subtotal + (subtotal * (inv.taxRate / 100));
-    totalRevenue += total;
+    totalRevenue += calculateTotal(inv.items, inv.taxRate);
 
     const clientKey = inv.clientName.toLowerCase().trim();
     if (clientKey) {
@@ -50,7 +49,7 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
               <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-1">Total Revenue</p>
               <p className="text-3xl font-black">
-                {new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(totalRevenue)}
+                {formatCurrency(totalRevenue, 'MYR')}
               </p>
             </div>
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">

@@ -60,8 +60,9 @@ export const ProfileView: React.FC<Props> = ({ profile, onSave, onManageBanks, o
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">Your Name / Business Name</label>
-                <input 
+                <label htmlFor="profileName" className="text-xs font-bold text-slate-500 uppercase">Your Name / Business Name</label>
+                <input
+                  id="profileName"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
@@ -70,8 +71,9 @@ export const ProfileView: React.FC<Props> = ({ profile, onSave, onManageBanks, o
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">Your Email</label>
-                <input 
+                <label htmlFor="profileEmail" className="text-xs font-bold text-slate-500 uppercase">Your Email</label>
+                <input
+                  id="profileEmail"
                   name="email"
                   type="email"
                   value={formData.email}
@@ -82,8 +84,9 @@ export const ProfileView: React.FC<Props> = ({ profile, onSave, onManageBanks, o
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-500 uppercase">Business Address</label>
-              <textarea 
+              <label htmlFor="profileAddress" className="text-xs font-bold text-slate-500 uppercase">Business Address</label>
+              <textarea
+                id="profileAddress"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}

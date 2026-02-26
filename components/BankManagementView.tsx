@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { BankDetail } from '../types';
+import { createNewBank } from '../utils/invoice';
 
 interface Props {
   banks: BankDetail[];
@@ -21,16 +22,9 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
   };
 
   const addBank = () => {
-    const newId = crypto.randomUUID();
-    const newBank: BankDetail = {
-      id: newId,
-      paymentMethod: 'Bank Transfer',
-      bankName: '',
-      accountName: '',
-      accountNo: ''
-    };
+    const newBank = createNewBank();
     setLocalBanks(prev => [...prev, newBank]);
-    setExpandedId(newId); // Automatically expand the newly added bank
+    setExpandedId(newBank.id);
   };
 
   const removeBank = (e: React.MouseEvent, id: string) => {
@@ -115,8 +109,9 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
                     <div className="px-6 pb-6 pt-2 border-t border-slate-50">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Payment Method</label>
-                          <input 
+                          <label htmlFor={`paymentMethod-${bank.id}`} className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Payment Method</label>
+                          <input
+                            id={`paymentMethod-${bank.id}`}
                             value={bank.paymentMethod}
                             onChange={(e) => handleBankChange(bank.id, 'paymentMethod', e.target.value)}
                             placeholder="e.g. Bank Transfer"
@@ -124,8 +119,9 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bank Name</label>
-                          <input 
+                          <label htmlFor={`bankName-${bank.id}`} className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bank Name</label>
+                          <input
+                            id={`bankName-${bank.id}`}
                             value={bank.bankName}
                             onChange={(e) => handleBankChange(bank.id, 'bankName', e.target.value)}
                             placeholder="e.g. Maybank, PayPal, etc."
@@ -133,8 +129,9 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Holder Name</label>
-                          <input 
+                          <label htmlFor={`accountName-${bank.id}`} className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Holder Name</label>
+                          <input
+                            id={`accountName-${bank.id}`}
                             value={bank.accountName}
                             onChange={(e) => handleBankChange(bank.id, 'accountName', e.target.value)}
                             placeholder="Name as it appears in bank"
@@ -142,8 +139,9 @@ export const BankManagementView: React.FC<Props> = ({ banks, onSave, onBack }) =
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Number</label>
-                          <input 
+                          <label htmlFor={`accountNo-${bank.id}`} className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Number</label>
+                          <input
+                            id={`accountNo-${bank.id}`}
                             value={bank.accountNo}
                             onChange={(e) => handleBankChange(bank.id, 'accountNo', e.target.value)}
                             placeholder="e.g. 1234567890"

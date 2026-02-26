@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 import { Invoice, LineItem, BankDetail } from '../types';
+import { formatCurrency, calculateSubtotal, calculateTax, createNewBank } from '../utils/invoice';
 
 interface Props {
   invoice: Invoice;
@@ -15,7 +16,36 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
   const [signatureVerticalPosition, setSignatureVerticalPosition] = useState<number>(invoice.signatureVerticalPosition || 0);
   const [signatureHorizontalPosition, setSignatureHorizontalPosition] = useState<number>(invoice.signatureHorizontalPosition || 0);
   const [isResizing, setIsResizing] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const signatureContainerRef = useRef<HTMLDivElement>(null);
+
+  const validate = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!formData.clientName.trim()) {
+      errors.clientName = 'Client name is required';
+    }
+    if (!formData.invoiceNumber.trim()) {
+      errors.invoiceNumber = 'Invoice number is required';
+    }
+    if (formData.items.length === 0) {
+      errors.items = 'At least one line item is required';
+    } else {
+      const hasValidItem = formData.items.some(
+        item => item.description.trim() !== '' && item.amount > 0
+      );
+      if (!hasValidItem) {
+        errors.items = 'At least one item must have a description and amount greater than 0';
+      }
+    }
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSave = () => {
+    if (validate()) {
+      onSave({ ...formData, signatureSize, signatureVerticalPosition, signatureHorizontalPosition });
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -53,7 +83,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
   const addBank = () => {
     setFormData(prev => ({
       ...prev,
-      banks: [...prev.banks, { id: crypto.randomUUID(), paymentMethod: 'Bank Transfer', bankName: '', accountName: '', accountNo: '' }]
+      banks: [...prev.banks, createNewBank()]
     }));
   };
 
@@ -79,26 +109,8 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
     setSignatureVerticalPosition(0);
   };
 
-  const handleSignatureDragStart = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStartX(e.clientX - signatureHorizontalPosition);
-    setDragStartY(e.clientY - signatureVerticalPosition);
-  };
-
-  const handleSignatureResizeStart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsResizing(true);
-    setResizeStartY(e.clientY);
-  };
-
-  const handleSignatureWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const newSize = signatureSize - (e.deltaY > 0 ? 5 : -5);
-    setSignatureSize(Math.max(40, Math.min(200, newSize)));
-  };
-
-  const subtotal = formData.items.reduce((sum, item) => sum + item.amount, 0);
-  const taxAmount = subtotal * (formData.taxRate / 100);
+  const subtotal = calculateSubtotal(formData.items);
+  const taxAmount = calculateTax(subtotal, formData.taxRate);
   const total = subtotal + taxAmount;
 
   return (
@@ -116,7 +128,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
           <button onClick={onCancel} className="px-6 py-2 rounded-xl border border-slate-200 hover:bg-white text-slate-600 font-medium transition-all">
             Cancel
           </button>
-          <button onClick={() => onSave({ ...formData, signatureSize, signatureVerticalPosition, signatureHorizontalPosition })} className="px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-100">
+          <button onClick={handleSave} className="px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-lg shadow-indigo-100">
             Save Invoice
           </button>
         </div>
@@ -128,12 +140,13 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
             <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">Basic & Sender Details</h4>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">Invoice #</label>
-                <input name="invoiceNumber" value={formData.invoiceNumber} onChange={handleInputChange} className="w-full rounded-lg border-slate-200" />
+                <label htmlFor="invoiceNumber" className="text-xs font-bold text-slate-500 uppercase">Invoice #</label>
+                <input id="invoiceNumber" name="invoiceNumber" value={formData.invoiceNumber} onChange={handleInputChange} className={`w-full rounded-lg border-slate-200 ${validationErrors.invoiceNumber ? 'border-red-400 ring-1 ring-red-400' : ''}`} />
+                {validationErrors.invoiceNumber && <p className="text-red-500 text-xs mt-1">{validationErrors.invoiceNumber}</p>}
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">Currency</label>
-                <select name="currency" value={formData.currency} onChange={handleInputChange} className="w-full rounded-lg border-slate-200">
+                <label htmlFor="currency" className="text-xs font-bold text-slate-500 uppercase">Currency</label>
+                <select id="currency" name="currency" value={formData.currency} onChange={handleInputChange} className="w-full rounded-lg border-slate-200">
                   <option value="MYR">MYR (RM)</option>
                   <option value="USD">USD ($)</option>
                   <option value="EUR">EUR (€)</option>
@@ -143,12 +156,12 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">Date</label>
-                <input type="date" name="date" value={formData.date} onChange={handleInputChange} className="w-full rounded-lg border-slate-200" />
+                <label htmlFor="date" className="text-xs font-bold text-slate-500 uppercase">Date</label>
+                <input id="date" type="date" name="date" value={formData.date} onChange={handleInputChange} className="w-full rounded-lg border-slate-200" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-500 uppercase">Status</label>
-                <select name="status" value={formData.status} onChange={handleInputChange} className="w-full rounded-lg border-slate-200">
+                <label htmlFor="status" className="text-xs font-bold text-slate-500 uppercase">Status</label>
+                <select id="status" name="status" value={formData.status} onChange={handleInputChange} className="w-full rounded-lg border-slate-200">
                   <option value="draft">Draft</option>
                   <option value="sent">Sent</option>
                   <option value="paid">Paid</option>
@@ -159,9 +172,9 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
             <div className="space-y-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                 <h4 className="text-xs font-bold text-slate-500 uppercase">Your Info</h4>
                 <div className="space-y-2">
-                  <input name="senderName" placeholder="Your Name" value={formData.senderName} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm" />
-                  <input name="senderEmail" placeholder="Your Email" value={formData.senderEmail} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm" />
-                  <textarea name="senderAddress" placeholder="Address" value={formData.senderAddress} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm h-16" />
+                  <input id="senderName" name="senderName" placeholder="Your Name" value={formData.senderName} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm" />
+                  <input id="senderEmail" name="senderEmail" placeholder="Your Email" value={formData.senderEmail} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm" />
+                  <textarea id="senderAddress" name="senderAddress" placeholder="Address" value={formData.senderAddress} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm h-16" />
                 </div>
             </div>
           </div>
@@ -171,8 +184,9 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
              <div className="space-y-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                 <h4 className="text-xs font-bold text-slate-500 uppercase">Bill To</h4>
                 <div className="space-y-2">
-                  <input name="clientName" placeholder="Client Name" value={formData.clientName} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm" />
-                  <textarea name="clientAddress" placeholder="Client Address" value={formData.clientAddress} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm h-16" />
+                  <input id="clientName" name="clientName" placeholder="Client Name" value={formData.clientName} onChange={handleInputChange} className={`w-full rounded-lg border-slate-200 text-sm ${validationErrors.clientName ? 'border-red-400 ring-1 ring-red-400' : ''}`} />
+                  {validationErrors.clientName && <p className="text-red-500 text-xs mt-1">{validationErrors.clientName}</p>}
+                  <textarea id="clientAddress" name="clientAddress" placeholder="Client Address" value={formData.clientAddress} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm h-16" />
                 </div>
              </div>
 
@@ -235,13 +249,14 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                 <tr className="bg-indigo-50/50">
                   <td colSpan={2} className="py-4 px-4 font-bold text-indigo-900">Total Amount</td>
                   <td className="py-4 px-2 font-black text-indigo-600 text-lg text-right">
-                    {new Intl.NumberFormat('en-MY', { style: 'currency', currency: formData.currency }).format(total)}
+                    {formatCurrency(total, formData.currency)}
                   </td>
                   <td></td>
                 </tr>
               </tfoot>
             </table>
           </div>
+          {validationErrors.items && <p className="text-red-500 text-xs mt-1">{validationErrors.items}</p>}
         </div>
 
         <div className="pt-8 border-t border-slate-100">
@@ -297,14 +312,14 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                             setIsResizing(false);
                           }}
                           enableResizing={{
-                            bottom: false,
-                            bottomLeft: false,
+                            bottom: true,
+                            bottomLeft: true,
                             bottomRight: true,
-                            left: false,
-                            right: false,
-                            top: false,
-                            topLeft: false,
-                            topRight: false
+                            left: true,
+                            right: true,
+                            top: true,
+                            topLeft: true,
+                            topRight: true
                           }}
                           disableDragging={false}
                           resizeGrid={[1, 1]}
@@ -372,14 +387,14 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
             </div>
           </div>
 
-          <label className="text-xs font-bold text-slate-500 uppercase">Notes</label>
-          <textarea name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Additional details..." className="w-full rounded-xl border-slate-200 text-sm h-24" />
+          <label htmlFor="notes" className="text-xs font-bold text-slate-500 uppercase">Notes</label>
+          <textarea id="notes" name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Additional details..." className="w-full rounded-xl border-slate-200 text-sm h-24" />
         </div>
       </div>
 
       <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40">
         <button onClick={onCancel} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold">Cancel</button>
-        <button onClick={() => onSave({ ...formData, signatureSize, signatureVerticalPosition, signatureHorizontalPosition })} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">Save Invoice</button>
+        <button onClick={handleSave} className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold">Save Invoice</button>
       </div>
     </div>
   );

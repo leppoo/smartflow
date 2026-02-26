@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Invoice } from '../types';
+import { formatCurrency, calculateTotal } from '../utils/invoice';
 
 interface Props {
   invoices: Invoice[];
@@ -11,27 +12,30 @@ interface Props {
   onUpdateStatus: (id: string, status: Invoice['status']) => void;
 }
 
+const ITEMS_PER_PAGE = 9;
+
 export const InvoiceList: React.FC<Props> = ({ invoices, onCreate, onEdit, onView, onDelete, onUpdateStatus }) => {
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const formatCurrency = (amount: number, currency: string) => {
-    const locale = currency === 'MYR' ? 'en-MY' : 'en-US';
-    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount);
-  };
-
-  const calculateTotal = (invoice: Invoice) => {
-    const subtotal = invoice.items.reduce((sum, item) => sum + item.amount, 0);
-    return subtotal + (subtotal * (invoice.taxRate / 100));
-  };
+  const totalPages = Math.ceil(invoices.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedInvoices = invoices.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const handleDeleteClick = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (deletingId === id) {
-      onDelete(id);
-      setDeletingId(null);
-    } else {
-      setDeletingId(id);
-      setTimeout(() => setDeletingId(current => current === id ? null : current), 3000);
+    setDeleteModalId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteModalId) {
+      onDelete(deleteModalId);
+      setDeleteModalId(null);
+      const remainingCount = invoices.length - 1;
+      const maxPage = Math.max(1, Math.ceil(remainingCount / ITEMS_PER_PAGE));
+      if (currentPage > maxPage) {
+        setCurrentPage(maxPage);
+      }
     }
   };
 
@@ -69,8 +73,9 @@ export const InvoiceList: React.FC<Props> = ({ invoices, onCreate, onEdit, onVie
           </button>
         </div>
       ) : (
+        <>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {invoices.map((inv) => (
+          {paginatedInvoices.map((inv) => (
             <div 
               key={inv.id} 
               className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow group relative"
@@ -106,7 +111,7 @@ export const InvoiceList: React.FC<Props> = ({ invoices, onCreate, onEdit, onVie
                 </div>
                 <div className="flex justify-between">
                   <span>Total:</span>
-                  <span className="font-bold text-slate-900">{formatCurrency(calculateTotal(inv), inv.currency)}</span>
+                  <span className="font-bold text-slate-900">{formatCurrency(calculateTotal(inv.items, inv.taxRate), inv.currency)}</span>
                 </div>
               </div>
 
@@ -125,24 +130,64 @@ export const InvoiceList: React.FC<Props> = ({ invoices, onCreate, onEdit, onVie
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 </button>
-                <button 
+                <button
                   onClick={(e) => handleDeleteClick(e, inv.id)}
-                  className={`p-2 rounded-lg transition-all flex items-center justify-center font-bold text-xs ${
-                    deletingId === inv.id 
-                      ? 'bg-red-600 text-white scale-105' 
-                      : 'bg-red-50 text-red-600 hover:bg-red-100'
-                  }`}
-                  title={deletingId === inv.id ? "Confirm Delete" : "Delete"}
+                  className="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center"
+                  title="Delete"
                 >
-                  {deletingId === inv.id ? (
-                    "Confirm?"
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                  )}
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
               </div>
             </div>
           ))}
+        </div>
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-6">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-2 rounded-lg border border-slate-200 text-slate-600 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-slate-500 px-3">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 rounded-lg border border-slate-200 text-slate-600 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        )}
+      </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+            <h3 className="text-lg font-bold text-slate-900">Delete Invoice</h3>
+            <p className="text-slate-500 text-sm">
+              Are you sure you want to delete this invoice? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDeleteModalId(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

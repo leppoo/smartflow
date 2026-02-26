@@ -1,23 +1,17 @@
 
 import React from 'react';
 import { Invoice } from '../types';
+import { formatCurrency as formatCurrencyUtil, calculateSubtotal, calculateTax } from '../utils/invoice';
 
 interface Props {
   invoice: Invoice;
 }
 
 export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
-  const formatCurrency = (amount: number) => {
-    try {
-      const locale = invoice.currency === 'MYR' ? 'en-MY' : 'en-US';
-      return new Intl.NumberFormat(locale, { style: 'currency', currency: invoice.currency }).format(amount);
-    } catch (e) {
-      return `${invoice.currency} ${amount.toFixed(2)}`;
-    }
-  };
+  const formatCurrency = (amount: number) => formatCurrencyUtil(amount, invoice.currency);
 
-  const subtotal = (invoice.items || []).reduce((sum, item) => sum + (item.amount || 0), 0);
-  const taxAmount = subtotal * ((invoice.taxRate || 0) / 100);
+  const subtotal = calculateSubtotal(invoice.items);
+  const taxAmount = calculateTax(subtotal, invoice.taxRate);
   const total = subtotal + taxAmount;
 
   return (
@@ -155,10 +149,11 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
             </div>
             <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Authorized Signature</p>
             <p className="font-black text-slate-900 text-xs mt-1 uppercase">{invoice.senderName}</p>
+            <p className="text-slate-500 text-[11px] font-medium">{invoice.senderEmail}</p>
           </div>
-          <div className="text-right text-[9px] text-slate-300 font-bold uppercase tracking-tighter">
+          {/* <div className="text-right text-[9px] text-slate-300 font-bold uppercase tracking-tighter">
              SmartFlow Invoice &bull; Secure Local Ledger &bull; No Cloud Storage
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
