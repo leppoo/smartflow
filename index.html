@@ -111,7 +111,8 @@
         size: A4 portrait;
       }
       body {
-        background-color: white !important;
+        background: white !important;
+        background-image: none !important;
         margin: 0;
         padding: 0;
       }
@@ -171,6 +172,32 @@
       for (var key in colors) {
         root.style.setProperty('--color-' + key, colors[key]);
       }
+    }
+  })();
+</script>
+<!-- Apply saved wallpaper before React mounts to prevent flash -->
+<script>
+  (function() {
+    var WALLPAPERS = {
+      'default': '#F8F9FB',
+      'soft-blue': 'linear-gradient(135deg, #E0E7FF 0%, #F0F4FF 50%, #E8EEFF 100%)',
+      'warm-peach': 'linear-gradient(135deg, #FFF5F0 0%, #FDE8E0 50%, #FFF0EA 100%)',
+      'cool-mint': 'linear-gradient(135deg, #E0FFF5 0%, #F0FFF8 50%, #E8FFF2 100%)',
+      'lavender-mist': 'linear-gradient(135deg, #F0E6FF 0%, #F8F0FF 50%, #EDE0FF 100%)',
+      'slate-mesh': 'linear-gradient(135deg, #E2E8F0 0%, #F1F5F9 50%, #E2E8F0 100%)'
+    };
+    var saved = localStorage.getItem('smartflow_wallpaper');
+    if (saved === 'custom') {
+      var custom = localStorage.getItem('smartflow_wallpaper_custom');
+      if (custom) {
+        document.addEventListener('DOMContentLoaded', function() {
+          document.body.style.background = 'url(' + custom + ') center/cover fixed no-repeat';
+        });
+      }
+    } else if (saved && WALLPAPERS[saved]) {
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.style.background = WALLPAPERS[saved];
+      });
     }
   })();
 </script>

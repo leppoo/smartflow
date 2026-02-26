@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { WallpaperPicker } from './WallpaperPicker';
 
 interface Props {
   onHome: () => void;
@@ -40,6 +41,7 @@ export const Navbar: React.FC<Props> = ({ onHome, onProfile, userName }) => {
           >
             {displayName}
           </button>
+          <WallpaperPicker />
           <ThemeSwitcher />
           <button
             onClick={onProfile}
