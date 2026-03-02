@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"^[[:space:]]*//.*\\\\|^[[:space:]]*\\\\/\\\\*\\\\|^\\\\*\" \"/c/Users/User/Desktop/Programming project/smartflow\" --include=\"*.tsx\" --include=\"*.ts\")",
+      "Bash(grep -n \"^[[:space:]]*//.*<\\\\|^[[:space:]]*\\\\/\\\\*.*<\\\\|<.*\\\\/\\\\/\" \"/c/Users/User/Desktop/Programming project/smartflow/components/InvoicePreview.tsx\")"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Invoice } from '../types';
-import { formatCurrency as formatCurrencyUtil, calculateSubtotal, calculateTax } from '../utils/invoice';
+import { formatCurrency as formatCurrencyUtil, calculateTotal } from '../utils/invoice';
 
 interface Props {
   invoice: Invoice;
@@ -10,9 +10,7 @@ interface Props {
 export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
   const formatCurrency = (amount: number) => formatCurrencyUtil(amount, invoice.currency);
 
-  const subtotal = calculateSubtotal(invoice.items);
-  const taxAmount = calculateTax(subtotal, invoice.taxRate);
-  const total = subtotal + taxAmount;
+  const total = calculateTotal(invoice.items, invoice.taxRate);
 
   return (
     <div className="flex flex-col h-full w-full bg-white text-slate-900">
@@ -72,10 +70,6 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
             ))}
           </tbody>
           <tfoot>
-            {/* <tr>
-              <td colSpan={2} className="pt-8 pb-2 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider">Subtotal</td>
-              <td className="pt-8 pb-2 text-right font-bold text-slate-900">{formatCurrency(subtotal)}</td>
-            </tr> */}
             <tr className="border-t-2 border-slate-900">
               <td colSpan={2} className="py-5 font-black text-base uppercase tracking-widest">Total Amount Due</td>
               <td className="py-5 text-right font-black text-1xl text-primary-600">{formatCurrency(total)}</td>
@@ -151,9 +145,6 @@ export const InvoicePreview: React.FC<Props> = ({ invoice }) => {
             <p className="font-black text-slate-900 text-xs mt-1 uppercase">{invoice.senderName}</p>
             <p className="text-slate-500 text-[11px] font-medium">{invoice.senderEmail}</p>
           </div>
-          {/* <div className="text-right text-[9px] text-slate-300 font-bold uppercase tracking-tighter">
-             SmartFlow Invoice &bull; Secure Local Ledger &bull; No Cloud Storage
-          </div> */}
         </div>
       </div>
     </div>

@@ -60,10 +60,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSaveProfile = (newProfile: UserProfile) => {
-    saveProfile(newProfile);
-  };
-
   const handleSaveBanks = (newBanks: BankDetail[]) => {
     const updatedProfile = { ...profile, banks: newBanks };
     saveProfile(updatedProfile);
@@ -214,7 +210,7 @@ const App: React.FC = () => {
         {view === 'profile' && (
           <ProfileView 
             profile={profile}
-            onSave={handleSaveProfile}
+            onSave={saveProfile}
             onManageBanks={() => setView('banks')}
             onBack={() => setView('dashboard')}
           />
