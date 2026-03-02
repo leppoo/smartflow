@@ -23,7 +23,7 @@ export const ThemeSwitcher: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 hover:border-primary-300 hover:text-primary-600 transition-all"
+        className="h-10 w-10 rounded-full bg-primary-50 flex items-center justify-center text-primary-400 border border-primary-200 hover:border-primary-300 hover:text-primary-600 transition-all"
         title="Change theme"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,8 +32,8 @@ export const ThemeSwitcher: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 px-2 w-56 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2">Theme</p>
+        <div className="absolute right-0 top-12 bg-white rounded-2xl shadow-2xl border border-primary-100 py-3 px-2 w-56 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+          <p className="text-[10px] font-black text-primary-300 uppercase tracking-widest px-3 mb-2">Theme</p>
           <div className="space-y-1">
             {themes.map((theme) => {
               const isActive = currentTheme.id === theme.id;
@@ -47,7 +47,7 @@ export const ThemeSwitcher: React.FC = () => {
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
                     isActive
                       ? 'bg-primary-50 text-primary-700 font-bold'
-                      : 'hover:bg-slate-50 text-slate-600'
+                      : 'hover:bg-primary-50 text-primary-500'
                   }`}
                 >
                   <div className="flex -space-x-1.5">

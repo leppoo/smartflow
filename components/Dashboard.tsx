@@ -38,7 +38,7 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
   return (
     <div className="space-y-10 pb-24 sm:pb-0">
       {/* Hero / Welcome Section */}
-      <section className="bg-gradient-to-br from-primary-600 to-accent-700 rounded-[2.5rem] p-8 sm:p-12 text-white shadow-2xl shadow-primary-200 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-primary-600 to-accent-700 rounded-[2.5rem] p-8 sm:p-12 text-white relative overflow-hidden">
         <div className="relative z-10">
           <h1 className="text-3xl sm:text-4xl font-black mb-4 tracking-tight">Business Hub</h1>
           <p className="text-primary-100 text-lg max-w-lg mb-8 opacity-90 leading-relaxed">
@@ -68,27 +68,27 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <button 
           onClick={() => onCreateNew()}
-          className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-primary-100 transition-all text-left flex items-center gap-6"
+          className="group bg-white p-8 rounded-3xl border border-primary-100 shadow-sm hover:shadow-xl hover:border-primary-200 transition-all text-left flex items-center gap-6"
         >
           <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"/></svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-slate-900">Create Invoice</h3>
-            <p className="text-slate-500 text-sm">Generate a new professional bill</p>
+            <h3 className="text-xl font-bold text-primary-900">Create Invoice</h3>
+            <p className="text-primary-400 text-sm">Generate a new professional bill</p>
           </div>
         </button>
 
         <button 
           onClick={onViewHistory}
-          className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-accent-100 transition-all text-left flex items-center gap-6"
+          className="group bg-white p-8 rounded-3xl border border-accent-100 shadow-sm hover:shadow-xl hover:border-accent-200 transition-all text-left flex items-center gap-6"
         >
           <div className="w-16 h-16 bg-accent-100 rounded-2xl flex items-center justify-center text-accent-600 group-hover:bg-accent-600 group-hover:text-white transition-all duration-300">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-slate-900">Invoice History</h3>
-            <p className="text-slate-500 text-sm">Track and manage past records</p>
+            <h3 className="text-xl font-bold text-primary-900">Invoice History</h3>
+            <p className="text-primary-400 text-sm">Track and manage past records</p>
           </div>
         </button>
       </section>
@@ -96,39 +96,39 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
       {/* Involved Businesses Section */}
       <section className="space-y-6">
         <div className="flex justify-between items-center px-2">
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-primary-900 flex items-center gap-2">
             <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             Involved Businesses
           </h2>
-          <span className="bg-slate-100 text-slate-500 text-xs font-bold px-3 py-1 rounded-full">{involvedBusinesses.length} Active</span>
+          <span className="bg-primary-50 text-primary-500 text-xs font-bold px-3 py-1 rounded-full">{involvedBusinesses.length} Active</span>
         </div>
 
         {involvedBusinesses.length === 0 ? (
-          <div className="bg-slate-50 rounded-[2rem] p-12 text-center border border-dashed border-slate-200">
-            <p className="text-slate-400 font-medium">No business connections found yet.</p>
-            <p className="text-slate-400 text-sm">Your clients will appear here as you create invoices.</p>
+          <div className="bg-primary-50 rounded-[2rem] p-12 text-center border border-dashed border-primary-200">
+            <p className="text-primary-400 font-medium">No business connections found yet.</p>
+            <p className="text-primary-400 text-sm">Your clients will appear here as you create invoices.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {involvedBusinesses.map((biz, idx) => (
-              <div key={idx} className="group bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:border-primary-100 transition-all flex flex-col gap-4">
+              <div key={idx} className="group bg-white rounded-[2rem] p-6 border border-primary-100 shadow-sm hover:shadow-xl hover:border-primary-200 transition-all flex flex-col gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-primary-600 font-black text-lg group-hover:bg-primary-50 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 font-black text-lg group-hover:bg-primary-100 transition-colors">
                     {biz.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="overflow-hidden flex-1">
-                    <h4 className="font-bold text-slate-900 truncate">{biz.name}</h4>
-                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Client Company</p>
+                    <h4 className="font-bold text-primary-900 truncate">{biz.name}</h4>
+                    <p className="text-xs text-primary-400 uppercase font-bold tracking-wider">Client Company</p>
                   </div>
                 </div>
                 
-                <div className="mt-4 pt-4 border-t border-slate-50 space-y-3">
+                <div className="mt-4 pt-4 border-t border-primary-50 space-y-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-400">Last Billed:</span>
-                    <span className="font-semibold text-slate-600">{new Date(biz.lastDate).toLocaleDateString()}</span>
+                    <span className="text-primary-400">Last Billed:</span>
+                    <span className="font-semibold text-primary-600">{new Date(biz.lastDate).toLocaleDateString()}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-400">Total Invoices:</span>
+                    <span className="text-primary-400">Total Invoices:</span>
                     <span className="font-black text-primary-600 bg-primary-50 w-6 h-6 rounded-full flex items-center justify-center text-[10px]">
                       {biz.count}
                     </span>
@@ -137,7 +137,7 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
 
                 <button 
                   onClick={() => onCreateNew(biz.name)}
-                  className="mt-2 w-full bg-slate-50 text-slate-600 group-hover:bg-primary-600 group-hover:text-white py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                  className="mt-2 w-full bg-primary-50 text-primary-600 group-hover:bg-primary-600 group-hover:text-white py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"/></svg>
                   Create Invoice

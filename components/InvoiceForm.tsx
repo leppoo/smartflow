@@ -114,18 +114,18 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
   const total = subtotal + taxAmount;
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 pb-24 sm:pb-0">
+    <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-primary-100 pb-24 sm:pb-0">
       {/* Header */}
-      <div className="p-6 sm:p-10 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="p-6 sm:p-10 border-b border-primary-100 bg-primary-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h2 className="text-2xl font-bold text-primary-900">
             {invoice.createdAt === formData.createdAt ? 'Edit Invoice' : 'New Invoice'}
           </h2>
-          <p className="text-slate-500">Enter simple billing details below.</p>
+          <p className="text-primary-400">Enter simple billing details below.</p>
         </div>
-        
+
         <div className="hidden sm:flex gap-3">
-          <button onClick={onCancel} className="px-6 py-2 rounded-xl border border-slate-200 hover:bg-white text-slate-600 font-medium transition-all">
+          <button onClick={onCancel} className="px-6 py-2 rounded-xl border border-primary-200 hover:bg-white text-primary-600 font-medium transition-all">
             Cancel
           </button>
           <button onClick={handleSave} className="px-6 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold transition-all shadow-lg shadow-primary-100">
@@ -137,31 +137,31 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
       <div className="p-6 sm:p-10 space-y-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div className="space-y-8">
-            <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">Basic & Sender Details</h4>
+            <h4 className="text-sm font-black text-primary-300 uppercase tracking-widest border-b pb-2">Basic & Sender Details</h4>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label htmlFor="invoiceNumber" className="text-xs font-bold text-slate-500 uppercase">Invoice #</label>
-                <input id="invoiceNumber" name="invoiceNumber" value={formData.invoiceNumber} onChange={handleInputChange} className={`w-full rounded-lg border-slate-200 ${validationErrors.invoiceNumber ? 'border-red-400 ring-1 ring-red-400' : ''}`} />
+                <label htmlFor="invoiceNumber" className="text-xs font-bold text-primary-400 uppercase">Invoice #</label>
+                <input id="invoiceNumber" name="invoiceNumber" value={formData.invoiceNumber} onChange={handleInputChange} className={`w-full rounded-lg border-primary-200 ${validationErrors.invoiceNumber ? 'border-red-400 ring-1 ring-red-400' : ''}`} />
                 {validationErrors.invoiceNumber && <p className="text-red-500 text-xs mt-1">{validationErrors.invoiceNumber}</p>}
               </div>
               <div className="space-y-1">
-                <label htmlFor="currency" className="text-xs font-bold text-slate-500 uppercase">Currency</label>
-                <select id="currency" name="currency" value={formData.currency} onChange={handleInputChange} className="w-full rounded-lg border-slate-200">
+                <label htmlFor="currency" className="text-xs font-bold text-primary-400 uppercase">Currency</label>
+                <select id="currency" name="currency" value={formData.currency} onChange={handleInputChange} className="w-full rounded-lg border-primary-200">
                   <option value="MYR">MYR (RM)</option>
                   <option value="USD">USD ($)</option>
                   <option value="EUR">EUR (€)</option>
                 </select>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label htmlFor="date" className="text-xs font-bold text-slate-500 uppercase">Date</label>
-                <input id="date" type="date" name="date" value={formData.date} onChange={handleInputChange} className="w-full rounded-lg border-slate-200" />
+                <label htmlFor="date" className="text-xs font-bold text-primary-400 uppercase">Date</label>
+                <input id="date" type="date" name="date" value={formData.date} onChange={handleInputChange} className="w-full rounded-lg border-primary-200" />
               </div>
               <div className="space-y-1">
-                <label htmlFor="status" className="text-xs font-bold text-slate-500 uppercase">Status</label>
-                <select id="status" name="status" value={formData.status} onChange={handleInputChange} className="w-full rounded-lg border-slate-200">
+                <label htmlFor="status" className="text-xs font-bold text-primary-400 uppercase">Status</label>
+                <select id="status" name="status" value={formData.status} onChange={handleInputChange} className="w-full rounded-lg border-primary-200">
                   <option value="draft">Draft</option>
                   <option value="sent">Sent</option>
                   <option value="paid">Paid</option>
@@ -169,40 +169,40 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
               </div>
             </div>
 
-            <div className="space-y-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <h4 className="text-xs font-bold text-slate-500 uppercase">Your Info</h4>
+            <div className="space-y-4 p-4 rounded-2xl bg-primary-50 border border-primary-100">
+                <h4 className="text-xs font-bold text-primary-400 uppercase">Your Info</h4>
                 <div className="space-y-2">
-                  <input id="senderName" name="senderName" placeholder="Your Name" value={formData.senderName} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm" />
-                  <input id="senderEmail" name="senderEmail" placeholder="Your Email" value={formData.senderEmail} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm" />
-                  <textarea id="senderAddress" name="senderAddress" placeholder="Address" value={formData.senderAddress} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm h-16" />
+                  <input id="senderName" name="senderName" placeholder="Your Name" value={formData.senderName} onChange={handleInputChange} className="w-full rounded-lg border-primary-200 text-sm" />
+                  <input id="senderEmail" name="senderEmail" placeholder="Your Email" value={formData.senderEmail} onChange={handleInputChange} className="w-full rounded-lg border-primary-200 text-sm" />
+                  <textarea id="senderAddress" name="senderAddress" placeholder="Address" value={formData.senderAddress} onChange={handleInputChange} className="w-full rounded-lg border-primary-200 text-sm h-16" />
                 </div>
             </div>
           </div>
 
           <div className="space-y-8">
-             <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">Client & Payment Info</h4>
-             <div className="space-y-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <h4 className="text-xs font-bold text-slate-500 uppercase">Bill To</h4>
+             <h4 className="text-sm font-black text-primary-300 uppercase tracking-widest border-b pb-2">Client & Payment Info</h4>
+             <div className="space-y-4 p-4 rounded-2xl bg-primary-50 border border-primary-100">
+                <h4 className="text-xs font-bold text-primary-400 uppercase">Bill To</h4>
                 <div className="space-y-2">
-                  <input id="clientName" name="clientName" placeholder="Client Name" value={formData.clientName} onChange={handleInputChange} className={`w-full rounded-lg border-slate-200 text-sm ${validationErrors.clientName ? 'border-red-400 ring-1 ring-red-400' : ''}`} />
+                  <input id="clientName" name="clientName" placeholder="Client Name" value={formData.clientName} onChange={handleInputChange} className={`w-full rounded-lg border-primary-200 text-sm ${validationErrors.clientName ? 'border-red-400 ring-1 ring-red-400' : ''}`} />
                   {validationErrors.clientName && <p className="text-red-500 text-xs mt-1">{validationErrors.clientName}</p>}
-                  <textarea id="clientAddress" name="clientAddress" placeholder="Client Address" value={formData.clientAddress} onChange={handleInputChange} className="w-full rounded-lg border-slate-200 text-sm h-16" />
+                  <textarea id="clientAddress" name="clientAddress" placeholder="Client Address" value={formData.clientAddress} onChange={handleInputChange} className="w-full rounded-lg border-primary-200 text-sm h-16" />
                 </div>
              </div>
 
              <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                   <h4 className="text-xs font-bold text-slate-500 uppercase">Payment Accounts</h4>
+                   <h4 className="text-xs font-bold text-primary-400 uppercase">Payment Accounts</h4>
                    <button onClick={addBank} className="text-primary-600 text-xs font-bold">+ Add</button>
                 </div>
                 <div className="space-y-3">
                   {formData.banks.map((bank) => (
                     <div key={bank.id} className="p-4 rounded-xl bg-primary-50/50 border border-primary-100 relative group">
-                      <button onClick={() => removeBank(bank.id)} className="absolute top-2 right-2 text-slate-300 hover:text-red-500">×</button>
+                      <button onClick={() => removeBank(bank.id)} className="absolute top-2 right-2 text-primary-300 hover:text-red-500">×</button>
                       <div className="grid grid-cols-2 gap-2">
-                        <input value={bank.bankName} onChange={(e) => handleBankChange(bank.id, 'bankName', e.target.value)} placeholder="Bank Name" className="text-xs rounded border-slate-100" />
-                        <input value={bank.accountNo} onChange={(e) => handleBankChange(bank.id, 'accountNo', e.target.value)} placeholder="Account No" className="text-xs rounded border-slate-100" />
-                        <input value={bank.accountName} onChange={(e) => handleBankChange(bank.id, 'accountName', e.target.value)} placeholder="Account Name" className="text-xs rounded border-slate-100 col-span-2" />
+                        <input value={bank.bankName} onChange={(e) => handleBankChange(bank.id, 'bankName', e.target.value)} placeholder="Bank Name" className="text-xs rounded border-primary-100" />
+                        <input value={bank.accountNo} onChange={(e) => handleBankChange(bank.id, 'accountNo', e.target.value)} placeholder="Account No" className="text-xs rounded border-primary-100" />
+                        <input value={bank.accountName} onChange={(e) => handleBankChange(bank.id, 'accountName', e.target.value)} placeholder="Account Name" className="text-xs rounded border-primary-100 col-span-2" />
                       </div>
                     </div>
                   ))}
@@ -213,21 +213,21 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold text-slate-900">Line Items</h3>
+            <h3 className="text-lg font-bold text-primary-900">Line Items</h3>
             <button onClick={addItem} className="text-primary-600 font-bold text-sm">+ Add Item</button>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                <tr className="border-b border-primary-100 text-xs font-bold text-primary-300 uppercase tracking-widest">
                   <th className="pb-4 px-2">Description</th>
                   <th className="pb-4 px-2 w-48">Period</th>
                   <th className="pb-4 px-2 w-32 text-right">Amount ({formData.currency})</th>
                   <th className="pb-4 px-2 w-10"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-primary-50">
                 {formData.items.map(item => (
                   <tr key={item.id}>
                     <td className="py-4 px-2">
@@ -240,7 +240,7 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                       <input type="number" value={item.amount} onChange={(e) => handleItemChange(item.id, 'amount', parseFloat(e.target.value) || 0)} className="w-full border-none p-0 focus:ring-0 text-sm text-right font-medium" />
                     </td>
                     <td className="py-4 px-2 text-right">
-                      <button onClick={() => removeItem(item.id)} className="text-slate-300 hover:text-red-500 font-bold text-lg">×</button>
+                      <button onClick={() => removeItem(item.id)} className="text-primary-300 hover:text-red-500 font-bold text-lg">×</button>
                     </td>
                   </tr>
                 ))}
@@ -259,9 +259,9 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
           {validationErrors.items && <p className="text-red-500 text-xs mt-1">{validationErrors.items}</p>}
         </div>
 
-        <div className="pt-8 border-t border-slate-100">
+        <div className="pt-8 border-t border-primary-100">
           <div className="mb-8">
-            <label className="text-xs font-bold text-slate-500 uppercase block mb-4">Signature</label>
+            <label className="text-xs font-bold text-primary-400 uppercase block mb-4">Signature</label>
             <div className="space-y-4">
               {/* Upload Section */}
               <label className="flex-1 relative cursor-pointer">
@@ -271,22 +271,22 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                   onChange={handleSignatureUpload}
                   className="hidden"
                 />
-                <div className="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50 transition-all text-center">
-                  📤 Upload Signature Image
+                <div className="px-4 py-2 rounded-lg border border-primary-200 text-primary-600 font-medium text-sm hover:bg-primary-50 transition-all text-center">
+                  Upload Signature Image
                 </div>
               </label>
 
               {/* Edit in Invoice Preview */}
               {formData.signature && (
-                <div className="p-4 rounded-lg bg-white border border-slate-100 space-y-3">
-                  <p className="text-xs font-bold text-slate-500 uppercase">Adjust signature:</p>
-                  
+                <div className="p-4 rounded-lg bg-white border border-primary-100 space-y-3">
+                  <p className="text-xs font-bold text-primary-400 uppercase">Adjust signature:</p>
+
                   <div className="grid grid-cols-2 gap-4">
                     {/* Left: Edit Section */}
                     <div className="space-y-3">
-                      <div 
+                      <div
                         ref={signatureContainerRef}
-                        className="border-b-2 border-slate-900 pb-2 relative overflow-visible bg-slate-50 rounded"
+                        className="border-b-2 border-primary-900 pb-2 relative overflow-visible bg-primary-50 rounded"
                         style={{ minHeight: '200px', paddingTop: '40px', paddingBottom: '40px' }}
                       >
                         <Rnd
@@ -324,46 +324,46 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                           disableDragging={false}
                           resizeGrid={[1, 1]}
                         >
-                          <div 
+                          <div
                             className={`cursor-move flex items-center justify-center transition-all ${isResizing ? 'ring-2 ring-primary-500 shadow-lg shadow-primary-300 rounded' : ''}`}
                             style={{ height: `${signatureSize}px`, width: 'auto' }}
                           >
-                            <img 
-                              src={formData.signature} 
-                              alt="Signature" 
-                              style={{ 
+                            <img
+                              src={formData.signature}
+                              alt="Signature"
+                              style={{
                                 height: `${signatureSize}px`,
                                 maxWidth: '300px'
                               }}
-                              className={`object-contain pointer-events-none select-none transition-all ${isResizing ? 'brightness-110 border-2 border-primary-500' : 'border border-slate-300'}`}
+                              className={`object-contain pointer-events-none select-none transition-all ${isResizing ? 'brightness-110 border-2 border-primary-500' : 'border border-primary-300'}`}
                               draggable="false"
                             />
                           </div>
                         </Rnd>
                       </div>
-                      
-                      <div className="text-xs text-slate-500 space-y-1 bg-slate-50 p-3 rounded">
+
+                      <div className="text-xs text-primary-400 space-y-1 bg-primary-50 p-3 rounded">
                         <p className="font-bold">Drag to move • Bottom-right corner to resize</p>
                         <p className="text-[11px]">
-                          Size: <span className="font-black text-slate-700">{signatureSize}px</span>
+                          Size: <span className="font-black text-primary-700">{signatureSize}px</span>
                         </p>
                         <p className="text-[11px]">
-                          Position: <span className="font-black text-slate-700">X: {signatureHorizontalPosition}px, Y: {signatureVerticalPosition}px</span>
+                          Position: <span className="font-black text-primary-700">X: {signatureHorizontalPosition}px, Y: {signatureVerticalPosition}px</span>
                         </p>
                       </div>
                     </div>
 
                     {/* Right: Preview Section */}
-                    <div className="space-y-3 bg-white border border-slate-200 p-4 rounded-lg">
-                      <p className="text-xs font-bold text-slate-500 uppercase">Preview:</p>
-                      <div 
-                        className="border-b-2 border-slate-900 mb-2 flex items-center justify-center overflow-visible"
+                    <div className="space-y-3 bg-white border border-primary-200 p-4 rounded-lg">
+                      <p className="text-xs font-bold text-primary-400 uppercase">Preview:</p>
+                      <div
+                        className="border-b-2 border-primary-900 mb-2 flex items-center justify-center overflow-visible"
                         style={{ minHeight: '100px' }}
                       >
-                        <img 
-                          src={formData.signature} 
-                          alt="Signature Preview" 
-                          style={{ 
+                        <img
+                          src={formData.signature}
+                          alt="Signature Preview"
+                          style={{
                             height: `${signatureSize}px`,
                             transform: `translate(${signatureHorizontalPosition}px, ${signatureVerticalPosition}px)`
                           }}
@@ -371,14 +371,14 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
                           draggable="false"
                         />
                       </div>
-                      <p className="text-[9px] text-slate-400 uppercase font-bold">Authorized Signature</p>
+                      <p className="text-[9px] text-primary-300 uppercase font-bold">Authorized Signature</p>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={clearSignature}
-                    className="w-full px-3 py-2 rounded text-slate-600 hover:text-red-500 font-medium text-sm transition-colors bg-slate-100 border border-slate-200 hover:border-red-300"
+                    className="w-full px-3 py-2 rounded text-primary-600 hover:text-red-500 font-medium text-sm transition-colors bg-primary-100 border border-primary-200 hover:border-red-300"
                   >
                     Remove Signature
                   </button>
@@ -387,13 +387,13 @@ export const InvoiceForm: React.FC<Props> = ({ invoice, onSave, onCancel }) => {
             </div>
           </div>
 
-          <label htmlFor="notes" className="text-xs font-bold text-slate-500 uppercase">Notes</label>
-          <textarea id="notes" name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Additional details..." className="w-full rounded-xl border-slate-200 text-sm h-24" />
+          <label htmlFor="notes" className="text-xs font-bold text-primary-400 uppercase">Notes</label>
+          <textarea id="notes" name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Additional details..." className="w-full rounded-xl border-primary-200 text-sm h-24" />
         </div>
       </div>
 
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40">
-        <button onClick={onCancel} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold">Cancel</button>
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-primary-100 p-4 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40">
+        <button onClick={onCancel} className="flex-1 py-3 rounded-xl border border-primary-200 text-primary-600 font-bold">Cancel</button>
         <button onClick={handleSave} className="flex-1 py-3 rounded-xl bg-primary-600 text-white font-bold">Save Invoice</button>
       </div>
     </div>

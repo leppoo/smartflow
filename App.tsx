@@ -195,7 +195,7 @@ const App: React.FC = () => {
           <div className="space-y-6">
             <button 
               onClick={() => setView('dashboard')}
-              className="text-slate-500 hover:text-primary-600 flex items-center gap-2 font-medium transition-colors"
+              className="text-primary-400 hover:text-primary-600 flex items-center gap-2 font-medium transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
               Back to Dashboard
@@ -241,7 +241,7 @@ const App: React.FC = () => {
             <div className="flex justify-between items-center no-print">
               <button 
                 onClick={() => setView('list')}
-                className="text-slate-600 hover:text-slate-900 flex items-center gap-2 font-medium"
+                className="text-primary-500 hover:text-primary-700 flex items-center gap-2 font-medium"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 Back to History
@@ -256,14 +256,14 @@ const App: React.FC = () => {
             </div>
             
             {/* The single wrapper for the preview */}
-            <div className="invoice-container overflow-hidden print:m-0 print:p-[15mm] border border-slate-100 print:border-none">
+            <div className="invoice-container overflow-hidden print:m-0 print:p-[15mm] border border-primary-100 print:border-none">
               <InvoicePreview invoice={currentInvoice} />
             </div>
           </div>
         )}
       </main>
       
-      <footer className="py-8 text-center text-slate-400 text-sm no-print">
+      <footer className="py-8 text-center text-primary-400 text-sm no-print">
         &copy; {new Date().getFullYear()} SmartFlow Invoice. Professional Billing.
       </footer>
     </div>

@@ -17,9 +17,8 @@ export const wallpapers: WallpaperDefinition[] = [
   { id: 'default', name: 'Default', css: '#F8F9FB', preview: '#F8F9FB' },
   { id: 'soft-blue', name: 'Soft Blue', css: 'linear-gradient(135deg, #E0E7FF 0%, #F0F4FF 50%, #E8EEFF 100%)', preview: '#E0E7FF' },
   { id: 'warm-peach', name: 'Warm Peach', css: 'linear-gradient(135deg, #FFF5F0 0%, #FDE8E0 50%, #FFF0EA 100%)', preview: '#FDE8E0' },
-  { id: 'cool-mint', name: 'Cool Mint', css: 'linear-gradient(135deg, #E0FFF5 0%, #F0FFF8 50%, #E8FFF2 100%)', preview: '#E0FFF5' },
-  { id: 'lavender-mist', name: 'Lavender Mist', css: 'linear-gradient(135deg, #F0E6FF 0%, #F8F0FF 50%, #EDE0FF 100%)', preview: '#F0E6FF' },
-  { id: 'slate-mesh', name: 'Slate Mesh', css: 'linear-gradient(135deg, #E2E8F0 0%, #F1F5F9 50%, #E2E8F0 100%)', preview: '#E2E8F0' },
+  { id: 'milk-coffee', name: 'Milk Coffee', css: 'linear-gradient(135deg, #E8DCC8 0%, #D9C9A8 50%, #C7B494 100%)', preview: '#D9C9A8' },
+  { id: 'woody', name: 'Woody', css: 'linear-gradient(135deg, #C8D4B8 0%, #B5C4A0 50%, #A8B294 100%)', preview: '#B5C4A0' },
 ];
 
 interface ThemeContextType {
