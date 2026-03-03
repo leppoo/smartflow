@@ -1,19 +1,24 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { FinancialData, Invoice } from '../types';
 import { formatCurrency, calculateTotal } from '../utils/invoice';
+import { Modal } from './Modal';
+import { EditBankBalancesView } from './EditBankBalancesView';
+import { EditAssetsView } from './EditAssetsView';
+import { EditExpensesView } from './EditExpensesView';
+import { EditLiabilitiesView } from './EditLiabilitiesView';
 
 interface Props {
   financialData: FinancialData;
   invoices: Invoice[];
   onBack: () => void;
-  onEditBalances: () => void;
-  onEditAssets: () => void;
-  onEditExpenses: () => void;
-  onEditLiabilities: () => void;
+  onSave: (data: FinancialData) => void;
 }
 
-export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices, onBack, onEditBalances, onEditAssets, onEditExpenses, onEditLiabilities }) => {
+type EditModal = 'balances' | 'assets' | 'expenses' | 'liabilities' | null;
+
+export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices, onBack, onSave }) => {
+  const [activeModal, setActiveModal] = useState<EditModal>(null);
   const currency = financialData.currency;
   const totalBankBalance = financialData.bankBalances.reduce((sum, b) => sum + (b.balance || 0), 0);
   const totalAssets = financialData.assets.reduce((sum, a) => sum + (a.value || 0), 0);
@@ -79,7 +84,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                 <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                 Bank Balances
               </h3>
-              <button onClick={onEditBalances} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
+              <button onClick={() => setActiveModal('balances')} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit
               </button>
@@ -88,7 +93,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
             {financialData.bankBalances.length === 0 ? (
               <div className="bg-primary-50 rounded-2xl p-8 text-center border border-dashed border-primary-200">
                 <p className="text-primary-400 font-medium">No bank accounts tracked yet.</p>
-                <button onClick={onEditBalances} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
+                <button onClick={() => setActiveModal('balances')} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -119,7 +124,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                 <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 Assets
               </h3>
-              <button onClick={onEditAssets} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
+              <button onClick={() => setActiveModal('assets')} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit
               </button>
@@ -128,7 +133,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
             {financialData.assets.length === 0 ? (
               <div className="bg-primary-50 rounded-2xl p-8 text-center border border-dashed border-primary-200">
                 <p className="text-primary-400 font-medium">No assets tracked yet.</p>
-                <button onClick={onEditAssets} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
+                <button onClick={() => setActiveModal('assets')} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
               </div>
             ) : (
               <div className="space-y-2">
@@ -154,7 +159,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                 <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 Expenses
               </h3>
-              <button onClick={onEditExpenses} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
+              <button onClick={() => setActiveModal('expenses')} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit
               </button>
@@ -163,7 +168,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
             {financialData.expenses.length === 0 ? (
               <div className="bg-primary-50 rounded-2xl p-8 text-center border border-dashed border-primary-200">
                 <p className="text-primary-400 font-medium">No expenses tracked yet.</p>
-                <button onClick={onEditExpenses} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
+                <button onClick={() => setActiveModal('expenses')} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
               </div>
             ) : (
               <div className="space-y-2">
@@ -185,6 +190,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
             )}
           </div>
         </section>
+
         {/* Liabilities Overview */}
         <section className="bg-white rounded-3xl shadow-xl border border-primary-100 overflow-hidden">
           <div className="p-8 space-y-4">
@@ -193,7 +199,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                 <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
                 Liabilities
               </h3>
-              <button onClick={onEditLiabilities} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
+              <button onClick={() => setActiveModal('liabilities')} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit
               </button>
@@ -202,7 +208,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
             {(financialData.liabilities || []).length === 0 ? (
               <div className="bg-primary-50 rounded-2xl p-8 text-center border border-dashed border-primary-200">
                 <p className="text-primary-400 font-medium">No liabilities tracked yet.</p>
-                <button onClick={onEditLiabilities} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
+                <button onClick={() => setActiveModal('liabilities')} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
               </div>
             ) : (
               <div className="space-y-2">
@@ -234,6 +240,43 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
           </div>
         </section>
       </div>
+
+      {/* Edit Modals */}
+      <Modal
+        isOpen={activeModal === 'balances'}
+        onClose={() => setActiveModal(null)}
+        title="Bank Balances"
+        subtitle={`Total: ${formatCurrency(totalBankBalance, currency)}`}
+      >
+        <EditBankBalancesView financialData={financialData} onSave={onSave} onClose={() => setActiveModal(null)} />
+      </Modal>
+
+      <Modal
+        isOpen={activeModal === 'assets'}
+        onClose={() => setActiveModal(null)}
+        title="Assets"
+        subtitle={`Total: ${formatCurrency(totalAssets, currency)}`}
+      >
+        <EditAssetsView financialData={financialData} onSave={onSave} onClose={() => setActiveModal(null)} />
+      </Modal>
+
+      <Modal
+        isOpen={activeModal === 'expenses'}
+        onClose={() => setActiveModal(null)}
+        title="Expenses"
+        subtitle={`Total: ${formatCurrency(totalExpenses, currency)}`}
+      >
+        <EditExpensesView financialData={financialData} onSave={onSave} onClose={() => setActiveModal(null)} />
+      </Modal>
+
+      <Modal
+        isOpen={activeModal === 'liabilities'}
+        onClose={() => setActiveModal(null)}
+        title="Liabilities"
+        subtitle={`Remaining: ${formatCurrency(totalLiabilities, currency)}`}
+      >
+        <EditLiabilitiesView financialData={financialData} onSave={onSave} onClose={() => setActiveModal(null)} />
+      </Modal>
     </div>
   );
 };

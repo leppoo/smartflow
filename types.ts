@@ -44,7 +44,7 @@ export interface Invoice {
   signatureHorizontalPosition?: number;
 }
 
-export type View = 'dashboard' | 'list' | 'create' | 'edit' | 'view' | 'profile' | 'banks' | 'financials' | 'edit-balances' | 'edit-assets' | 'edit-expenses' | 'edit-liabilities';
+export type View = 'dashboard' | 'list' | 'create' | 'edit' | 'view' | 'profile' | 'banks' | 'financials';
 
 export interface FinancialBankBalance {
   id: string;
