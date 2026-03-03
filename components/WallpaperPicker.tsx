@@ -53,6 +53,9 @@ export const WallpaperPicker: React.FC = () => {
           <div className="space-y-1">
             {wallpapers.map((wp) => {
               const isActive = currentWallpaper === wp.id;
+              const previewStyle = wp.id === 'accent'
+                ? { background: `rgb(var(--color-accent-100))` }
+                : { background: '#F8F9FB' };
               return (
                 <button
                   key={wp.id}
@@ -68,7 +71,7 @@ export const WallpaperPicker: React.FC = () => {
                 >
                   <span
                     className="w-7 h-7 rounded-lg border-2 border-white shadow-sm flex-shrink-0"
-                    style={{ background: wp.css }}
+                    style={previewStyle}
                   />
                   <span className="text-sm font-medium flex-1">{wp.name}</span>
                   {isActive && (

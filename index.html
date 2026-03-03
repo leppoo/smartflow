@@ -160,10 +160,9 @@
   (function() {
     var THEMES = {
       'default': { 'primary-50':'238 242 255','primary-100':'224 231 255','primary-200':'199 210 254','primary-300':'165 180 252','primary-400':'129 140 248','primary-500':'99 102 241','primary-600':'79 70 229','primary-700':'67 56 202','primary-800':'55 48 163','primary-900':'49 46 129','accent-50':'245 243 255','accent-100':'237 233 254','accent-200':'221 214 254','accent-300':'196 181 253','accent-400':'167 139 250','accent-500':'139 92 246','accent-600':'124 58 237','accent-700':'109 40 217','accent-800':'91 33 182','accent-900':'76 29 149' },
-      'navy-emerald': { 'primary-50':'238 241 248','primary-100':'217 223 240','primary-200':'179 191 225','primary-300':'141 159 210','primary-400':'103 127 195','primary-500':'45 78 160','primary-600':'31 58 138','primary-700':'25 47 110','primary-800':'19 35 83','primary-900':'13 24 55','accent-50':'236 253 245','accent-100':'209 250 229','accent-200':'167 243 208','accent-300':'110 231 183','accent-400':'52 211 153','accent-500':'16 185 129','accent-600':'5 150 105','accent-700':'4 120 87','accent-800':'6 95 70','accent-900':'6 78 59' },
-      'slate-amber': { 'primary-50':'248 250 252','primary-100':'241 245 249','primary-200':'226 232 240','primary-300':'203 213 225','primary-400':'148 163 184','primary-500':'100 116 139','primary-600':'71 85 105','primary-700':'51 65 85','primary-800':'30 41 59','primary-900':'15 23 42','accent-50':'255 251 235','accent-100':'254 243 199','accent-200':'253 230 138','accent-300':'252 211 77','accent-400':'251 191 36','accent-500':'245 158 11','accent-600':'217 119 6','accent-700':'180 83 9','accent-800':'146 64 14','accent-900':'120 53 15' },
       'milk-coffee': { 'primary-50':'250 250 250','primary-100':'245 245 245','primary-200':'229 229 229','primary-300':'212 212 212','primary-400':'163 163 163','primary-500':'115 115 115','primary-600':'82 82 82','primary-700':'64 64 64','primary-800':'38 38 38','primary-900':'23 23 23','accent-50':'252 251 247','accent-100':'248 245 236','accent-200':'243 239 224','accent-300':'228 220 196','accent-400':'206 194 162','accent-500':'180 165 128','accent-600':'152 136 98','accent-700':'122 108 74','accent-800':'96 82 54','accent-900':'72 60 36' },
-      'woody': { 'primary-50':'252 246 245','primary-100':'247 233 232','primary-200':'238 208 205','primary-300':'222 174 170','primary-400':'198 134 128','primary-500':'162 90 84','primary-600':'118 56 50','primary-700':'82 42 39','primary-800':'60 28 25','primary-900':'42 18 16','accent-50':'244 251 243','accent-100':'232 246 230','accent-200':'210 238 206','accent-300':'182 225 176','accent-400':'166 212 159','accent-500':'130 185 122','accent-600':'98 158 90','accent-700':'72 126 65','accent-800':'52 98 46','accent-900':'36 72 30' }
+      'woody': { 'primary-50':'252 246 245','primary-100':'247 233 232','primary-200':'238 208 205','primary-300':'222 174 170','primary-400':'198 134 128','primary-500':'162 90 84','primary-600':'118 56 50','primary-700':'82 42 39','primary-800':'60 28 25','primary-900':'42 18 16','accent-50':'244 251 243','accent-100':'232 246 230','accent-200':'210 238 206','accent-300':'182 225 176','accent-400':'166 212 159','accent-500':'130 185 122','accent-600':'98 158 90','accent-700':'72 126 65','accent-800':'52 98 46','accent-900':'36 72 30' },
+      'chiffon': { 'primary-50':'254 242 240','primary-100':'253 226 222','primary-200':'250 198 190','primary-300':'245 164 154','primary-400':'241 135 122','primary-500':'237 106 90','primary-600':'214 80 65','primary-700':'178 60 46','primary-800':'142 44 32','primary-900':'108 30 20','accent-50':'254 254 248','accent-100':'252 251 238','accent-200':'249 247 221','accent-300':'244 241 187','accent-400':'230 225 148','accent-500':'208 201 108','accent-600':'176 168 78','accent-700':'142 134 56','accent-800':'108 100 38','accent-900':'76 70 22' }
     };
     var saved = localStorage.getItem('smartflow_theme');
     if (saved && THEMES[saved]) {
@@ -178,13 +177,6 @@
 <!-- Apply saved wallpaper before React mounts to prevent flash -->
 <script>
   (function() {
-    var WALLPAPERS = {
-      'default': '#F8F9FB',
-      'soft-blue': 'linear-gradient(135deg, #E0E7FF 0%, #F0F4FF 50%, #E8EEFF 100%)',
-      'warm-peach': 'linear-gradient(135deg, #FFF5F0 0%, #FDE8E0 50%, #FFF0EA 100%)',
-      'milk-coffee': 'linear-gradient(135deg, #E8DCC8 0%, #D9C9A8 50%, #C7B494 100%)',
-      'woody': 'linear-gradient(135deg, #C8D4B8 0%, #B5C4A0 50%, #A8B294 100%)'
-    };
     var saved = localStorage.getItem('smartflow_wallpaper');
     if (saved === 'custom') {
       var custom = localStorage.getItem('smartflow_wallpaper_custom');
@@ -193,10 +185,13 @@
           document.body.style.background = 'url(' + custom + ') center/cover fixed no-repeat';
         });
       }
-    } else if (saved && WALLPAPERS[saved]) {
-      document.addEventListener('DOMContentLoaded', function() {
-        document.body.style.background = WALLPAPERS[saved];
-      });
+    } else if (saved === 'accent') {
+      var rgb = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-100').trim();
+      if (rgb) {
+        document.addEventListener('DOMContentLoaded', function() {
+          document.body.style.background = 'rgb(' + rgb + ')';
+        });
+      }
     }
   })();
 </script>

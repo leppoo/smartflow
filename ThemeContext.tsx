@@ -9,16 +9,11 @@ const WALLPAPER_CUSTOM_KEY = 'smartflow_wallpaper_custom';
 export interface WallpaperDefinition {
   id: string;
   name: string;
-  css: string;
-  preview: string;
 }
 
 export const wallpapers: WallpaperDefinition[] = [
-  { id: 'default', name: 'Default', css: '#F8F9FB', preview: '#F8F9FB' },
-  { id: 'soft-blue', name: 'Soft Blue', css: 'linear-gradient(135deg, #E0E7FF 0%, #F0F4FF 50%, #E8EEFF 100%)', preview: '#E0E7FF' },
-  { id: 'warm-peach', name: 'Warm Peach', css: 'linear-gradient(135deg, #FFF5F0 0%, #FDE8E0 50%, #FFF0EA 100%)', preview: '#FDE8E0' },
-  { id: 'milk-coffee', name: 'Milk Coffee', css: 'linear-gradient(135deg, #E8DCC8 0%, #D9C9A8 50%, #C7B494 100%)', preview: '#D9C9A8' },
-  { id: 'woody', name: 'Woody', css: 'linear-gradient(135deg, #C8D4B8 0%, #B5C4A0 50%, #A8B294 100%)', preview: '#B5C4A0' },
+  { id: 'default', name: 'Default' },
+  { id: 'accent', name: 'Accent' },
 ];
 
 interface ThemeContextType {
@@ -50,9 +45,11 @@ const applyTheme = (theme: ThemeDefinition) => {
 const applyWallpaper = (wallpaperId: string, customDataUrl: string | null) => {
   if (wallpaperId === 'custom' && customDataUrl) {
     document.body.style.background = `url(${customDataUrl}) center/cover fixed no-repeat`;
+  } else if (wallpaperId === 'accent') {
+    const rgb = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-100').trim();
+    document.body.style.background = rgb ? `rgb(${rgb})` : '#F8F9FB';
   } else {
-    const wp = wallpapers.find(w => w.id === wallpaperId);
-    document.body.style.background = wp ? wp.css : '#F8F9FB';
+    document.body.style.background = '#F8F9FB';
   }
   document.body.style.minHeight = '100vh';
 };
@@ -81,7 +78,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     applyWallpaper(currentWallpaper, customWallpaper);
-  }, [currentWallpaper, customWallpaper]);
+  }, [currentWallpaper, customWallpaper, currentTheme]);
 
   const setTheme = (themeId: string) => {
     const theme = themes.find(t => t.id === themeId);
