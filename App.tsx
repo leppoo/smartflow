@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Invoice, View, UserProfile, BankDetail } from './types';
+import { Invoice, View, UserProfile, BankDetail, FinancialData } from './types';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './components/Dashboard';
 import { InvoiceList } from './components/InvoiceList';
@@ -8,9 +8,11 @@ import { InvoiceForm } from './components/InvoiceForm';
 import { InvoicePreview } from './components/InvoicePreview';
 import { ProfileView } from './components/ProfileView';
 import { BankManagementView } from './components/BankManagementView';
+import { FinancialTrackingView } from './components/FinancialTrackingView';
 
 const STORAGE_KEY = 'smartflow_invoices';
 const PROFILE_KEY = 'smartflow_profile';
+const FINANCIALS_KEY = 'smartflow_financials';
 
 const App: React.FC = () => {
   const [view, setView] = useState<View>('dashboard');
@@ -21,6 +23,13 @@ const App: React.FC = () => {
     email: '',
     address: '',
     banks: []
+  });
+  const [financialData, setFinancialData] = useState<FinancialData>({
+    bankBalances: [],
+    assets: [],
+    expenses: [],
+    currency: 'MYR',
+    lastUpdated: 0,
   });
 
   // Load from local storage
@@ -43,6 +52,15 @@ const App: React.FC = () => {
         console.error("Failed to load profile", e);
       }
     }
+
+    const savedFinancials = localStorage.getItem(FINANCIALS_KEY);
+    if (savedFinancials) {
+      try {
+        setFinancialData(JSON.parse(savedFinancials));
+      } catch (e) {
+        console.error("Failed to load financial data", e);
+      }
+    }
   }, []);
 
   const isProfileComplete = (p: UserProfile) => {
@@ -58,6 +76,11 @@ const App: React.FC = () => {
     if (isProfileComplete(newProfile)) {
       setTimeout(() => setView('dashboard'), 1500);
     }
+  };
+
+  const handleSaveFinancials = (data: FinancialData) => {
+    setFinancialData(data);
+    localStorage.setItem(FINANCIALS_KEY, JSON.stringify(data));
   };
 
   const handleSaveBanks = (newBanks: BankDetail[]) => {
@@ -180,10 +203,11 @@ const App: React.FC = () => {
       
       <main className="flex-grow container mx-auto px-4 py-8 max-w-6xl">
         {view === 'dashboard' && (
-          <Dashboard 
-            invoices={invoices} 
-            onViewHistory={() => setView('list')} 
+          <Dashboard
+            invoices={invoices}
+            onViewHistory={() => setView('list')}
             onCreateNew={handleCreateNew}
+            onFinancials={() => setView('financials')}
           />
         )}
 
@@ -217,10 +241,19 @@ const App: React.FC = () => {
         )}
 
         {view === 'banks' && (
-          <BankManagementView 
+          <BankManagementView
             banks={profile.banks}
             onSave={handleSaveBanks}
             onBack={() => setView('profile')}
+          />
+        )}
+
+        {view === 'financials' && (
+          <FinancialTrackingView
+            financialData={financialData}
+            invoices={invoices}
+            onSave={handleSaveFinancials}
+            onBack={() => setView('dashboard')}
           />
         )}
 

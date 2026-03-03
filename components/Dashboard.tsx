@@ -7,9 +7,10 @@ interface Props {
   invoices: Invoice[];
   onViewHistory: () => void;
   onCreateNew: (clientName?: string) => void;
+  onFinancials: () => void;
 }
 
-export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNew }) => {
+export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNew, onFinancials }) => {
   // Extract unique clients and some basic stats
   const uniqueClientsMap = new Map<string, { name: string, lastDate: string, count: number }>();
   
@@ -65,8 +66,8 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
       </section>
 
       {/* Action Navigation */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <button 
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <button
           onClick={() => onCreateNew()}
           className="group bg-white p-8 rounded-3xl border border-primary-100 shadow-sm hover:shadow-xl hover:border-primary-200 transition-all text-left flex items-center gap-6"
         >
@@ -79,7 +80,7 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
           </div>
         </button>
 
-        <button 
+        <button
           onClick={onViewHistory}
           className="group bg-white p-8 rounded-3xl border border-accent-100 shadow-sm hover:shadow-xl hover:border-accent-200 transition-all text-left flex items-center gap-6"
         >
@@ -89,6 +90,19 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
           <div>
             <h3 className="text-xl font-bold text-primary-900">Invoice History</h3>
             <p className="text-primary-400 text-sm">Track and manage past records</p>
+          </div>
+        </button>
+
+        <button
+          onClick={onFinancials}
+          className="group bg-white p-8 rounded-3xl border border-accent-100 shadow-sm hover:shadow-xl hover:border-accent-200 transition-all text-left flex items-center gap-6"
+        >
+          <div className="w-16 h-16 bg-accent-100 rounded-2xl flex items-center justify-center text-accent-600 group-hover:bg-accent-600 group-hover:text-white transition-all duration-300">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-primary-900">Financial Tracking</h3>
+            <p className="text-primary-400 text-sm">Monitor your financial health</p>
           </div>
         </button>
       </section>

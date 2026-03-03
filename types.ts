@@ -44,4 +44,34 @@ export interface Invoice {
   signatureHorizontalPosition?: number;
 }
 
-export type View = 'dashboard' | 'list' | 'create' | 'edit' | 'view' | 'profile' | 'banks';
+export type View = 'dashboard' | 'list' | 'create' | 'edit' | 'view' | 'profile' | 'banks' | 'financials';
+
+export interface FinancialBankBalance {
+  id: string;
+  bankName: string;
+  accountLabel: string;
+  balance: number;
+}
+
+export interface FinancialAsset {
+  id: string;
+  name: string;
+  category: string;
+  value: number;
+}
+
+export interface FinancialExpense {
+  id: string;
+  description: string;
+  category: string;
+  amount: number;
+  date: string;
+}
+
+export interface FinancialData {
+  bankBalances: FinancialBankBalance[];
+  assets: FinancialAsset[];
+  expenses: FinancialExpense[];
+  currency: string;
+  lastUpdated: number;
+}
