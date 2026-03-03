@@ -1,4 +1,4 @@
-import { LineItem, BankDetail, FinancialBankBalance, FinancialAsset, FinancialExpense } from '../types';
+import { LineItem, BankDetail, FinancialBankBalance, FinancialAsset, FinancialExpense, FinancialLiability } from '../types';
 
 const CURRENCY_LOCALE_MAP: Record<string, string> = {
   MYR: 'en-MY',
@@ -63,5 +63,16 @@ export function createNewExpense(): FinancialExpense {
     category: 'Other',
     amount: 0,
     date: new Date().toISOString().split('T')[0],
+    expenseType: 'Fixed',
+  };
+}
+
+export function createNewLiability(): FinancialLiability {
+  return {
+    id: crypto.randomUUID(),
+    name: '',
+    type: 'Loan',
+    totalAmount: 0,
+    remainingBalance: 0,
   };
 }

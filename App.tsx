@@ -9,6 +9,10 @@ import { InvoicePreview } from './components/InvoicePreview';
 import { ProfileView } from './components/ProfileView';
 import { BankManagementView } from './components/BankManagementView';
 import { FinancialTrackingView } from './components/FinancialTrackingView';
+import { EditBankBalancesView } from './components/EditBankBalancesView';
+import { EditAssetsView } from './components/EditAssetsView';
+import { EditExpensesView } from './components/EditExpensesView';
+import { EditLiabilitiesView } from './components/EditLiabilitiesView';
 
 const STORAGE_KEY = 'smartflow_invoices';
 const PROFILE_KEY = 'smartflow_profile';
@@ -30,6 +34,7 @@ const App: React.FC = () => {
     expenses: [],
     currency: 'MYR',
     lastUpdated: 0,
+    liabilities: [],
   });
 
   // Load from local storage
@@ -205,6 +210,7 @@ const App: React.FC = () => {
         {view === 'dashboard' && (
           <Dashboard
             invoices={invoices}
+            financialData={financialData}
             onViewHistory={() => setView('list')}
             onCreateNew={handleCreateNew}
             onFinancials={() => setView('financials')}
@@ -252,8 +258,43 @@ const App: React.FC = () => {
           <FinancialTrackingView
             financialData={financialData}
             invoices={invoices}
-            onSave={handleSaveFinancials}
             onBack={() => setView('dashboard')}
+            onEditBalances={() => setView('edit-balances')}
+            onEditAssets={() => setView('edit-assets')}
+            onEditExpenses={() => setView('edit-expenses')}
+            onEditLiabilities={() => setView('edit-liabilities')}
+          />
+        )}
+
+        {view === 'edit-balances' && (
+          <EditBankBalancesView
+            financialData={financialData}
+            onSave={handleSaveFinancials}
+            onBack={() => setView('financials')}
+          />
+        )}
+
+        {view === 'edit-assets' && (
+          <EditAssetsView
+            financialData={financialData}
+            onSave={handleSaveFinancials}
+            onBack={() => setView('financials')}
+          />
+        )}
+
+        {view === 'edit-expenses' && (
+          <EditExpensesView
+            financialData={financialData}
+            onSave={handleSaveFinancials}
+            onBack={() => setView('financials')}
+          />
+        )}
+
+        {view === 'edit-liabilities' && (
+          <EditLiabilitiesView
+            financialData={financialData}
+            onSave={handleSaveFinancials}
+            onBack={() => setView('financials')}
           />
         )}
 

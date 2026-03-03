@@ -44,7 +44,7 @@ export interface Invoice {
   signatureHorizontalPosition?: number;
 }
 
-export type View = 'dashboard' | 'list' | 'create' | 'edit' | 'view' | 'profile' | 'banks' | 'financials';
+export type View = 'dashboard' | 'list' | 'create' | 'edit' | 'view' | 'profile' | 'banks' | 'financials' | 'edit-balances' | 'edit-assets' | 'edit-expenses' | 'edit-liabilities';
 
 export interface FinancialBankBalance {
   id: string;
@@ -66,12 +66,22 @@ export interface FinancialExpense {
   category: string;
   amount: number;
   date: string;
+  expenseType: 'Fixed' | 'Variable';
+}
+
+export interface FinancialLiability {
+  id: string;
+  name: string;
+  type: 'Loan' | 'Credit Card' | 'Payable';
+  totalAmount: number;
+  remainingBalance: number;
 }
 
 export interface FinancialData {
   bankBalances: FinancialBankBalance[];
   assets: FinancialAsset[];
   expenses: FinancialExpense[];
+  liabilities: FinancialLiability[];
   currency: string;
   lastUpdated: number;
 }

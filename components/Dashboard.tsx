@@ -1,16 +1,17 @@
 
 import React from 'react';
-import { Invoice } from '../types';
+import { Invoice, FinancialData } from '../types';
 import { formatCurrency, calculateTotal } from '../utils/invoice';
 
 interface Props {
   invoices: Invoice[];
+  financialData: FinancialData;
   onViewHistory: () => void;
   onCreateNew: (clientName?: string) => void;
   onFinancials: () => void;
 }
 
-export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNew, onFinancials }) => {
+export const Dashboard: React.FC<Props> = ({ invoices, financialData, onViewHistory, onCreateNew, onFinancials }) => {
   // Extract unique clients and some basic stats
   const uniqueClientsMap = new Map<string, { name: string, lastDate: string, count: number }>();
   
@@ -36,6 +37,10 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
   const involvedBusinesses = Array.from(uniqueClientsMap.values())
     .sort((a, b) => new Date(b.lastDate).getTime() - new Date(a.lastDate).getTime());
 
+  const totalBankBalance = financialData.bankBalances.reduce((sum, b) => sum + (b.balance || 0), 0);
+  const totalAssets = financialData.assets.reduce((sum, a) => sum + (a.value || 0), 0);
+  const currency = financialData.currency || 'MYR';
+
   return (
     <div className="space-y-10 pb-24 sm:pb-0">
       {/* Hero / Welcome Section */}
@@ -45,21 +50,32 @@ export const Dashboard: React.FC<Props> = ({ invoices, onViewHistory, onCreateNe
           <p className="text-primary-100 text-lg max-w-lg mb-8 opacity-90 leading-relaxed">
             Welcome back to your professional billing dashboard. Manage relationships and track your financial flow.
           </p>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-              <p className="text-primary-200 text-xs font-bold uppercase tracking-widest mb-1">Total Revenue</p>
-              <p className="text-3xl font-black">
-                {formatCurrency(totalRevenue, 'MYR')}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+              <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest mb-1">Total Revenue</p>
+              <p className="text-xl sm:text-2xl font-black">
+                {formatCurrency(totalRevenue, currency)}
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-              <p className="text-primary-200 text-xs font-bold uppercase tracking-widest mb-1">Invoices Issued</p>
-              <p className="text-3xl font-black">{invoices.length}</p>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+              <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest mb-1">Invoices Issued</p>
+              <p className="text-xl sm:text-2xl font-black">{invoices.length}</p>
+            </div>
+            <div className="bg-white/20 backdrop-blur-md rounded-2xl p-5 border-2 border-white/40 ring-1 ring-white/20">
+              <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">Bank Balance</p>
+              <p className="text-xl sm:text-2xl font-black">
+                {formatCurrency(totalBankBalance, currency)}
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+              <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest mb-1">Total Assets</p>
+              <p className="text-xl sm:text-2xl font-black">
+                {formatCurrency(totalAssets, currency)}
+              </p>
             </div>
           </div>
         </div>
-        
+
         {/* Abstract shapes for aesthetics */}
         <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-64 h-64 bg-primary-400/20 rounded-full blur-3xl"></div>
