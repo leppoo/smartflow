@@ -74,7 +74,7 @@ export interface FinancialLiability {
   name: string;
   type: 'Loan' | 'Credit Card' | 'Payable';
   totalAmount: number;
-  remainingBalance: number;
+  amountPaid: number;
 }
 
 export interface FinancialData {

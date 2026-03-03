@@ -23,7 +23,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
   const totalBankBalance = financialData.bankBalances.reduce((sum, b) => sum + (b.balance || 0), 0);
   const totalAssets = financialData.assets.reduce((sum, a) => sum + (a.value || 0), 0);
   const totalExpenses = financialData.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
-  const totalLiabilities = (financialData.liabilities || []).reduce((sum, l) => sum + (l.remainingBalance || 0), 0);
+  const totalLiabilities = (financialData.liabilities || []).reduce((sum, l) => sum + ((l.totalAmount || 0) - (l.amountPaid || 0)), 0);
   const totalRevenue = invoices.reduce((sum, inv) => sum + calculateTotal(inv.items, inv.taxRate), 0);
   const netCashFlow = totalRevenue - totalExpenses;
 
@@ -42,7 +42,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
 
       <div className="space-y-8">
         {/* Financial Overview Hero */}
-        <section className="bg-gradient-to-br from-primary-600 to-accent-700 rounded-[2.5rem] p-8 sm:p-12 text-white relative overflow-hidden">
+        <section className="bg-gradient-to-br from-primary-600 to-accent-700 rounded-[2.5rem] p-8 sm:p-11 text-white relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="text-2xl font-black mb-6 tracking-tight">Financial Overview</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -54,8 +54,8 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                 <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest mb-1">Total Assets</p>
                 <p className="text-base sm:text-xl font-black truncate">{formatCurrency(totalAssets, currency)}</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 min-w-0">
-                <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest mb-1">Liabilities</p>
+              <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 border-2 border-white/40 ring-1 ring-white/20 min-w-0">
+                <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">Liabilities</p>
                 <p className={`text-base sm:text-xl font-black truncate ${totalLiabilities > 0 ? 'text-red-300' : ''}`}>
                   {formatCurrency(totalLiabilities, currency)}
                 </p>
@@ -213,8 +213,9 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
             ) : (
               <div className="space-y-2">
                 {financialData.liabilities.map((liability) => {
+                  const remaining = (liability.totalAmount || 0) - (liability.amountPaid || 0);
                   const paidPercent = liability.totalAmount > 0
-                    ? Math.round(((liability.totalAmount - liability.remainingBalance) / liability.totalAmount) * 100)
+                    ? Math.round(((liability.amountPaid || 0) / liability.totalAmount) * 100)
                     : 0;
                   return (
                     <div key={liability.id} className="bg-primary-50/50 rounded-xl p-4 border border-primary-100">
@@ -224,7 +225,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                           <p className="text-xs text-primary-400">{liability.type}</p>
                         </div>
                         <div className="text-right ml-4">
-                          <p className="text-lg font-black text-red-600">{formatCurrency(liability.remainingBalance || 0, currency)}</p>
+                          <p className="text-lg font-black text-red-600">{formatCurrency(remaining, currency)}</p>
                           <p className="text-[10px] text-primary-400">of {formatCurrency(liability.totalAmount || 0, currency)}</p>
                         </div>
                       </div>

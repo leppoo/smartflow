@@ -73,6 +73,6 @@ export function createNewLiability(): FinancialLiability {
     name: '',
     type: 'Loan',
     totalAmount: 0,
-    remainingBalance: 0,
+    amountPaid: 0,
   };
 }

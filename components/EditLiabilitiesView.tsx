@@ -92,11 +92,11 @@ export const EditLiabilitiesView: React.FC<Props> = ({ financialData, onSave, on
                   </div>
                   <div className="flex gap-2 items-end">
                     <div className="flex-1 space-y-1">
-                      <label className="text-[10px] font-bold text-primary-300 uppercase tracking-wider">Remaining</label>
+                      <label className="text-[10px] font-bold text-primary-300 uppercase tracking-wider">Amount Paid</label>
                       <input
                         type="number"
-                        value={entry.remainingBalance || ''}
-                        onChange={(e) => updateEntry(entry.id, 'remainingBalance', parseFloat(e.target.value) || 0)}
+                        value={entry.amountPaid || ''}
+                        onChange={(e) => updateEntry(entry.id, 'amountPaid', parseFloat(e.target.value) || 0)}
                         placeholder="0.00"
                         className="w-full rounded-xl border border-primary-200 p-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
