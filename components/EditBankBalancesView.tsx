@@ -14,6 +14,7 @@ export const EditBankBalancesView: React.FC<Props> = ({ financialData, onSave, o
   const [balances, setBalances] = useState<FinancialBankBalance[]>(financialData.bankBalances);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const addEntry = () => {
     const newEntry = createNewFinancialBankBalance();
@@ -26,7 +27,14 @@ export const EditBankBalancesView: React.FC<Props> = ({ financialData, onSave, o
   };
 
   const removeEntry = (id: string) => {
-    setBalances(prev => prev.filter(b => b.id !== id));
+    setBalances(prev => {
+      const updated = prev.filter(b => b.id !== id);
+      // Auto-save after deletion
+      onSave({ ...financialData, bankBalances: updated, lastUpdated: Date.now() });
+      setShowSavedMessage(true);
+      setTimeout(() => setShowSavedMessage(false), 3000);
+      return updated;
+    });
     if (editingId === id) setEditingId(null);
   };
 
@@ -88,7 +96,7 @@ export const EditBankBalancesView: React.FC<Props> = ({ financialData, onSave, o
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    removeEntry(entry.id);
+                    setDeleteConfirm(entry.id);
                   }}
                   className="absolute bottom-3 right-3 p-2 text-primary-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                   title="Delete account"
@@ -167,6 +175,35 @@ export const EditBankBalancesView: React.FC<Props> = ({ financialData, onSave, o
           Save Changes
         </button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        title="Delete Confirmation"
+        subtitle={balances.find(b => b.id === deleteConfirm)?.bankName || 'Account'}
+      >
+        <div className="p-6 space-y-4">
+          <p className="text-primary-600">Are you sure you want to delete this account? This action cannot be undone.</p>
+        </div>
+        <div className="p-6 bg-primary-50 border-t border-primary-100 flex justify-end gap-3">
+          <button
+            onClick={() => setDeleteConfirm(null)}
+            className="px-6 py-3 rounded-xl text-primary-600 font-bold hover:bg-primary-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (deleteConfirm) removeEntry(deleteConfirm);
+              setDeleteConfirm(null);
+            }}
+            className="px-6 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

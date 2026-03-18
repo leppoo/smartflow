@@ -16,6 +16,7 @@ export const EditAssetsView: React.FC<Props> = ({ financialData, onSave, onClose
   const [assets, setAssets] = useState<FinancialAsset[]>(financialData.assets);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const addEntry = () => {
     const newEntry = createNewAsset();
@@ -28,7 +29,14 @@ export const EditAssetsView: React.FC<Props> = ({ financialData, onSave, onClose
   };
 
   const removeEntry = (id: string) => {
-    setAssets(prev => prev.filter(a => a.id !== id));
+    setAssets(prev => {
+      const updated = prev.filter(a => a.id !== id);
+      // Auto-save after deletion
+      onSave({ ...financialData, assets: updated, lastUpdated: Date.now() });
+      setShowSavedMessage(true);
+      setTimeout(() => setShowSavedMessage(false), 3000);
+      return updated;
+    });
     if (editingId === id) setEditingId(null);
   };
 
@@ -91,7 +99,7 @@ export const EditAssetsView: React.FC<Props> = ({ financialData, onSave, onClose
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    removeEntry(asset.id);
+                    setDeleteConfirm(asset.id);
                   }}
                   className="absolute bottom-3 right-3 p-2 text-primary-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                   title="Delete asset"
@@ -180,6 +188,35 @@ export const EditAssetsView: React.FC<Props> = ({ financialData, onSave, onClose
           Save Changes
         </button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        title="Delete Confirmation"
+        subtitle={assets.find(a => a.id === deleteConfirm)?.name || 'Asset'}
+      >
+        <div className="p-6 space-y-4">
+          <p className="text-primary-600">Are you sure you want to delete this asset? This action cannot be undone.</p>
+        </div>
+        <div className="p-6 bg-primary-50 border-t border-primary-100 flex justify-end gap-3">
+          <button
+            onClick={() => setDeleteConfirm(null)}
+            className="px-6 py-3 rounded-xl text-primary-600 font-bold hover:bg-primary-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (deleteConfirm) removeEntry(deleteConfirm);
+              setDeleteConfirm(null);
+            }}
+            className="px-6 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

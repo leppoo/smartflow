@@ -16,6 +16,7 @@ export const EditLiabilitiesView: React.FC<Props> = ({ financialData, onSave, on
   const [liabilities, setLiabilities] = useState<FinancialLiability[]>(financialData.liabilities || []);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const addEntry = () => {
     const newEntry = createNewLiability();
@@ -28,7 +29,14 @@ export const EditLiabilitiesView: React.FC<Props> = ({ financialData, onSave, on
   };
 
   const removeEntry = (id: string) => {
-    setLiabilities(prev => prev.filter(l => l.id !== id));
+    setLiabilities(prev => {
+      const updated = prev.filter(l => l.id !== id);
+      // Auto-save after deletion
+      onSave({ ...financialData, liabilities: updated, lastUpdated: Date.now() });
+      setShowSavedMessage(true);
+      setTimeout(() => setShowSavedMessage(false), 3000);
+      return updated;
+    });
     if (editingId === id) setEditingId(null);
   };
 
@@ -84,7 +92,7 @@ export const EditLiabilitiesView: React.FC<Props> = ({ financialData, onSave, on
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      removeEntry(entry.id);
+                      setDeleteConfirm(entry.id);
                     }}
                     className="absolute top-3 left-3 p-2 text-primary-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                     title="Delete liability"
@@ -204,6 +212,35 @@ export const EditLiabilitiesView: React.FC<Props> = ({ financialData, onSave, on
           Save Changes
         </button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        title="Delete Confirmation"
+        subtitle={liabilities.find(l => l.id === deleteConfirm)?.name || 'Liability'}
+      >
+        <div className="p-6 space-y-4">
+          <p className="text-primary-600">Are you sure you want to delete this liability? This action cannot be undone.</p>
+        </div>
+        <div className="p-6 bg-primary-50 border-t border-primary-100 flex justify-end gap-3">
+          <button
+            onClick={() => setDeleteConfirm(null)}
+            className="px-6 py-3 rounded-xl text-primary-600 font-bold hover:bg-primary-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (deleteConfirm) removeEntry(deleteConfirm);
+              setDeleteConfirm(null);
+            }}
+            className="px-6 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

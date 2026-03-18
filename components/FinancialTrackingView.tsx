@@ -26,6 +26,7 @@ interface Props {
 
 type EditModal = 'liabilities' | null;
 type PageView = 'main' | 'expensesHistory';
+type DeleteConfirmType = { type: 'bank' | 'asset' | 'expense'; id: string; name: string } | null;
 
 export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices, onBack, onSave }) => {
   const [activeModal, setActiveModal] = useState<EditModal>(null);
@@ -39,6 +40,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
   const [expenses, setExpenses] = useState<FinancialExpense[]>(financialData.expenses);
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
   const [showExpenseSavedMessage, setShowExpenseSavedMessage] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmType>(null);
 
   const currency = financialData.currency;
 
@@ -85,7 +87,14 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
   };
 
   const removeBankBalance = (id: string) => {
-    setBankBalances(prev => prev.filter(b => b.id !== id));
+    setBankBalances(prev => {
+      const updated = prev.filter(b => b.id !== id);
+      // Auto-save after deletion
+      onSave({ ...financialData, bankBalances: updated, lastUpdated: Date.now() });
+      setShowBankSavedMessage(true);
+      setTimeout(() => setShowBankSavedMessage(false), 3000);
+      return updated;
+    });
     if (editingBankId === id) setEditingBankId(null);
   };
 
@@ -109,7 +118,14 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
   };
 
   const removeAsset = (id: string) => {
-    setAssets(prev => prev.filter(a => a.id !== id));
+    setAssets(prev => {
+      const updated = prev.filter(a => a.id !== id);
+      // Auto-save after deletion
+      onSave({ ...financialData, assets: updated, lastUpdated: Date.now() });
+      setShowAssetSavedMessage(true);
+      setTimeout(() => setShowAssetSavedMessage(false), 3000);
+      return updated;
+    });
     if (editingAssetId === id) setEditingAssetId(null);
   };
 
@@ -133,7 +149,14 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
   };
 
   const removeExpense = (id: string) => {
-    setExpenses(prev => prev.filter(e => e.id !== id));
+    setExpenses(prev => {
+      const updated = prev.filter(e => e.id !== id);
+      // Auto-save after deletion
+      onSave({ ...financialData, expenses: updated, lastUpdated: Date.now() });
+      setShowExpenseSavedMessage(true);
+      setTimeout(() => setShowExpenseSavedMessage(false), 3000);
+      return updated;
+    });
     if (editingExpenseId === id) setEditingExpenseId(null);
   };
 
@@ -249,7 +272,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        removeBankBalance(bank.id);
+                        setDeleteConfirm({ type: 'bank', id: bank.id, name: bank.bankName || 'Unnamed Bank' });
                       }}
                       className="absolute bottom-3 right-3 p-2 text-primary-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                       title="Delete account"
@@ -315,7 +338,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        removeAsset(asset.id);
+                        setDeleteConfirm({ type: 'asset', id: asset.id, name: asset.name || 'Unnamed Asset' });
                       }}
                       className="delete-icon-btn p-3 text-red-400 border border-red-400 bg-transparent rounded-l-lg transform group-hover:translate-x-0 group-hover:opacity-100 translate-x-full opacity-0"
                       title="Delete asset"
@@ -404,7 +427,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        removeExpense(expense.id);
+                        setDeleteConfirm({ type: 'expense', id: expense.id, name: expense.description || 'Unnamed Expense' });
                       }}
                       className="delete-icon-btn p-3 text-red-400 border border-red-400 bg-transparent rounded-l-lg transform group-hover:translate-x-0 group-hover:opacity-100 translate-x-full opacity-0"
                       title="Delete expense"
@@ -684,6 +707,39 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
         subtitle={`Remaining: ${formatCurrency(totalLiabilities, currency)}`}
       >
         <EditLiabilitiesView financialData={financialData} onSave={onSave} onClose={() => setActiveModal(null)} />
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        title="Delete Confirmation"
+        subtitle={deleteConfirm?.name}
+      >
+        <div className="p-6 space-y-4">
+          <p className="text-primary-600">Are you sure you want to delete this {deleteConfirm?.type}? This action cannot be undone.</p>
+        </div>
+        <div className="p-6 bg-primary-50 border-t border-primary-100 flex justify-end gap-3">
+          <button
+            onClick={() => setDeleteConfirm(null)}
+            className="px-6 py-3 rounded-xl text-primary-600 font-bold hover:bg-primary-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (deleteConfirm) {
+                if (deleteConfirm.type === 'bank') removeBankBalance(deleteConfirm.id);
+                else if (deleteConfirm.type === 'asset') removeAsset(deleteConfirm.id);
+                else if (deleteConfirm.type === 'expense') removeExpense(deleteConfirm.id);
+              }
+              setDeleteConfirm(null);
+            }}
+            className="px-6 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-colors"
+          >
+            Delete
+          </button>
+        </div>
       </Modal>
     </div>
   );
