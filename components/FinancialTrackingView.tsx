@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
-import { FinancialData, Invoice } from '../types';
-import { formatCurrency, calculateTotal } from '../utils/invoice';
+import React, { useState, useMemo } from 'react';
+import { FinancialData, Invoice, FinancialBankBalance } from '../types';
+import { formatCurrency, calculateTotal, createNewFinancialBankBalance } from '../utils/invoice';
 import { Modal } from './Modal';
-import { EditBankBalancesView } from './EditBankBalancesView';
 import { EditAssetsView } from './EditAssetsView';
 import { EditExpensesView } from './EditExpensesView';
 import { EditLiabilitiesView } from './EditLiabilitiesView';
+import { ExpensesHistoryView } from './ExpensesHistoryView';
 
 interface Props {
   financialData: FinancialData;
@@ -15,19 +15,85 @@ interface Props {
   onSave: (data: FinancialData) => void;
 }
 
-type EditModal = 'balances' | 'assets' | 'expenses' | 'liabilities' | null;
+type EditModal = 'assets' | 'expenses' | 'liabilities' | null;
+type PageView = 'main' | 'expensesHistory';
 
 export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices, onBack, onSave }) => {
   const [activeModal, setActiveModal] = useState<EditModal>(null);
+  const [currentPage, setCurrentPage] = useState<PageView>('main');
+  const [bankBalances, setBankBalances] = useState<FinancialBankBalance[]>(financialData.bankBalances);
+  const [editingBankId, setEditingBankId] = useState<string | null>(null);
+  const [showBankSavedMessage, setShowBankSavedMessage] = useState(false);
+
   const currency = financialData.currency;
-  const totalBankBalance = financialData.bankBalances.reduce((sum, b) => sum + (b.balance || 0), 0);
+
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+  const currentMonth = today.substring(0, 7); // Get YYYY-MM
+  
+  // Get current month name (e.g., "March", "April")
+  const currentMonthName = new Date().toLocaleDateString('en-US', { month: 'long' });
+
+  // Filter expenses: only current month's expenses for the main view
+  const todayExpenses = useMemo(() => {
+    return financialData.expenses.filter(e => {
+      const expenseMonth = e.date.substring(0, 7); // Get YYYY-MM
+      return expenseMonth === currentMonth;
+    });
+  }, [financialData.expenses, currentMonth]);
+
+  // Count past month expenses (expenses from months before current month)
+  const pastExpensesCount = useMemo(() => {
+    return financialData.expenses.filter(e => {
+      const expenseMonth = e.date.substring(0, 7); // Get YYYY-MM
+      return expenseMonth < currentMonth;
+    }).length;
+  }, [financialData.expenses, currentMonth]);
+
+  const totalBankBalance = bankBalances.reduce((sum, b) => sum + (b.balance || 0), 0);
   const totalAssets = financialData.assets.reduce((sum, a) => sum + (a.value || 0), 0);
   const totalExpenses = financialData.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+  const todayExpensesTotal = todayExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
   const totalLiabilities = (financialData.liabilities || []).reduce((sum, l) => sum + ((l.totalAmount || 0) - (l.amountPaid || 0)), 0);
   const totalRevenue = invoices.reduce((sum, inv) => sum + calculateTotal(inv.items, inv.taxRate), 0);
   const netCashFlow = totalRevenue - totalExpenses;
 
-  return (
+  // Bank Balance handlers
+  const addBankBalance = () => {
+    const newEntry = createNewFinancialBankBalance();
+    setBankBalances(prev => [...prev, newEntry]);
+    setEditingBankId(newEntry.id);
+  };
+
+  const updateBankBalance = (id: string, field: keyof FinancialBankBalance, value: string | number) => {
+    setBankBalances(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b));
+  };
+
+  const removeBankBalance = (id: string) => {
+    setBankBalances(prev => prev.filter(b => b.id !== id));
+    if (editingBankId === id) setEditingBankId(null);
+  };
+
+  const saveBankBalances = () => {
+    onSave({ ...financialData, bankBalances, lastUpdated: Date.now() });
+    setShowBankSavedMessage(true);
+    setTimeout(() => setShowBankSavedMessage(false), 3000);
+  };
+
+  const editingBankEntry = bankBalances.find(b => b.id === editingBankId);
+
+  // Show expenses history page
+  if (currentPage === 'expensesHistory') {
+    return (
+      <ExpensesHistoryView
+        expenses={financialData.expenses}
+        currency={currency}
+        onBack={() => setCurrentPage('main')}
+      />
+    );
+  }
+
+  return (                
     <div className="max-w-4xl mx-auto pb-24 sm:pb-0 relative">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
@@ -47,18 +113,18 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
             <h2 className="text-2xl font-black mb-6 tracking-tight">Financial Overview</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 border-2 border-white/40 ring-1 ring-white/20 min-w-0">
-                <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">Bank Balances</p>
+                <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">Savings / Bank Balances</p>
                 <p className="text-base sm:text-xl font-black truncate">{formatCurrency(totalBankBalance, currency)}</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 min-w-0">
-                <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest mb-1">Total Assets</p>
-                <p className="text-base sm:text-xl font-black truncate">{formatCurrency(totalAssets, currency)}</p>
               </div>
               <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 border-2 border-white/40 ring-1 ring-white/20 min-w-0">
                 <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">Liabilities</p>
                 <p className={`text-base sm:text-xl font-black truncate ${totalLiabilities > 0 ? 'text-red-300' : ''}`}>
                   {formatCurrency(totalLiabilities, currency)}
                 </p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 min-w-0">
+                <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest mb-1">Total Assets</p>
+                <p className="text-base sm:text-xl font-black truncate">{formatCurrency(totalAssets, currency)}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 min-w-0">
                 <p className="text-primary-200 text-[10px] font-bold uppercase tracking-widest mb-1">Total Expenses</p>
@@ -84,33 +150,63 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                 <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                 Bank Balances
               </h3>
-              <button onClick={() => setActiveModal('balances')} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                Edit
+              <button onClick={addBankBalance} className="bg-primary-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-700 transition-all shadow-lg shadow-primary-100 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"/></svg>
+                Add Account
               </button>
             </div>
 
-            {financialData.bankBalances.length === 0 ? (
+            {bankBalances.length === 0 ? (
               <div className="bg-primary-50 rounded-2xl p-8 text-center border border-dashed border-primary-200">
                 <p className="text-primary-400 font-medium">No bank accounts tracked yet.</p>
-                <button onClick={() => setActiveModal('balances')} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
+                <button onClick={addBankBalance} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {financialData.bankBalances.map((bank) => (
-                  <div key={bank.id} className="bg-primary-50/50 rounded-2xl p-5 border border-primary-100">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center text-primary-600 font-black text-sm">
-                        {(bank.bankName || '?').charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-primary-900 truncate">{bank.bankName || 'Unnamed Bank'}</p>
-                        <p className="text-xs text-primary-400 truncate">{bank.accountLabel || 'No label'}</p>
-                      </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {bankBalances.map((bank) => (
+                  <button
+                    key={bank.id}
+                    onClick={() => setEditingBankId(bank.id)}
+                    className="relative bg-white rounded-2xl p-5 border border-primary-100 hover:border-primary-300 hover:shadow-md transition-all text-left group overflow-hidden"
+                  >
+                    {/* Edit Icon - Top Right */}
+                    <div className="absolute top-3 right-3 p-2 text-primary-400">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
                     </div>
-                    <p className="text-xl font-black text-primary-700">{formatCurrency(bank.balance || 0, currency)}</p>
-                  </div>
+
+                    {/* Card Content */}
+                    <div className="pr-8">
+                      <p className="font-bold text-primary-900 truncate text-base">{bank.bankName || 'Unnamed Bank'}</p>
+                      <p className="text-xs text-primary-400 truncate mt-2">{bank.accountLabel || 'No label'}</p>
+                      <p className="text-sm font-bold text-primary-600 mt-3">{bank.balance ? formatCurrency(bank.balance, currency) : 'No balance'}</p>
+                    </div>
+
+                    {/* Delete Button - Bottom Right */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeBankBalance(bank.id);
+                      }}
+                      className="absolute bottom-3 right-3 p-2 text-primary-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      title="Delete account"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </button>
                 ))}
+              </div>
+            )}
+
+            {showBankSavedMessage && (
+              <div className="flex justify-center py-2">
+                <div className="bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg font-bold text-sm flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"/></svg>
+                  Saved!
+                </div>
               </div>
             )}
           </div>
@@ -155,29 +251,47 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
         <section className="bg-white rounded-3xl shadow-xl border border-primary-100 overflow-hidden">
           <div className="p-8 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-primary-900 flex items-center gap-2">
-                <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                Expenses
-              </h3>
-              <button onClick={() => setActiveModal('expenses')} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                Edit
-              </button>
+              <div>
+                <h3 className="text-lg font-bold text-primary-900 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                  Expenses ({currentMonthName})
+                </h3>
+                {pastExpensesCount > 0 && (
+                  <p className="text-xs text-primary-400 mt-1">{pastExpensesCount} past month{pastExpensesCount !== 1 ? 's' : ''} in history</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {pastExpensesCount > 0 && (
+                  <button
+                    onClick={() => setCurrentPage('expensesHistory')}
+                    className="bg-amber-50 text-amber-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-amber-100 transition-colors flex items-center gap-1.5"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    History
+                  </button>
+                )}
+                <button onClick={() => setActiveModal('expenses')} className="bg-primary-50 text-primary-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-100 transition-colors flex items-center gap-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Edit
+                </button>
+              </div>
             </div>
 
-            {financialData.expenses.length === 0 ? (
+            {todayExpenses.length === 0 ? (
               <div className="bg-primary-50 rounded-2xl p-8 text-center border border-dashed border-primary-200">
-                <p className="text-primary-400 font-medium">No expenses tracked yet.</p>
+                <p className="text-primary-400 font-medium">No expenses tracked for this month.</p>
                 <button onClick={() => setActiveModal('expenses')} className="text-primary-600 font-bold hover:underline mt-2 text-sm">Add one now</button>
               </div>
             ) : (
               <div className="space-y-2">
-                {financialData.expenses.map((expense) => (
+                {todayExpenses.map((expense) => (
                   <div key={expense.id} className="bg-primary-50/50 rounded-xl p-4 border border-primary-100 flex justify-between items-center">
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-primary-900 truncate">{expense.description || 'Unnamed Expense'}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-xs text-primary-400">{expense.category} &middot; {new Date(expense.date).toLocaleDateString()}</p>
+                        <p className="text-xs text-primary-400">{expense.category}</p>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${(expense.expenseType || 'Fixed') === 'Fixed' ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
                           {expense.expenseType || 'Fixed'}
                         </span>
@@ -242,16 +356,66 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
         </section>
       </div>
 
-      {/* Edit Modals */}
-      <Modal
-        isOpen={activeModal === 'balances'}
-        onClose={() => setActiveModal(null)}
-        title="Bank Balances"
-        subtitle={`Total: ${formatCurrency(totalBankBalance, currency)}`}
-      >
-        <EditBankBalancesView financialData={financialData} onSave={onSave} onClose={() => setActiveModal(null)} />
-      </Modal>
+      {/* Edit Modal for Bank Balance */}
+      {editingBankEntry && (
+        <Modal
+          isOpen={!!editingBankId}
+          onClose={() => setEditingBankId(null)}
+          title="Edit Bank Account"
+          subtitle={editingBankEntry.bankName}
+        >
+          <div className="p-6 space-y-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-primary-300 uppercase tracking-wider">Bank Name</label>
+              <input
+                value={editingBankEntry.bankName}
+                onChange={(e) => updateBankBalance(editingBankEntry.id, 'bankName', e.target.value)}
+                placeholder="e.g. Maybank"
+                className="w-full rounded-xl border border-primary-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-primary-300 uppercase tracking-wider">Account Label</label>
+              <input
+                value={editingBankEntry.accountLabel}
+                onChange={(e) => updateBankBalance(editingBankEntry.id, 'accountLabel', e.target.value)}
+                placeholder="e.g. Business Checking"
+                className="w-full rounded-xl border border-primary-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-primary-300 uppercase tracking-wider">Balance</label>
+              <input
+                type="number"
+                value={editingBankEntry.balance || ''}
+                onChange={(e) => updateBankBalance(editingBankEntry.id, 'balance', parseFloat(e.target.value) || 0)}
+                placeholder="0.00"
+                className="w-full rounded-xl border border-primary-200 p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
 
+          <div className="p-6 bg-primary-50 border-t border-primary-100 flex justify-end gap-3">
+            <button
+              onClick={() => setEditingBankId(null)}
+              className="px-6 py-3 rounded-xl text-primary-600 font-bold hover:bg-primary-100 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                saveBankBalances();
+                setEditingBankId(null);
+              }}
+              className="px-8 py-3 rounded-xl bg-primary-600 text-white font-bold shadow-lg shadow-primary-100 hover:bg-primary-700 transition-all"
+            >
+              Save
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Edit Modals */}
       <Modal
         isOpen={activeModal === 'assets'}
         onClose={() => setActiveModal(null)}
@@ -265,7 +429,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
         isOpen={activeModal === 'expenses'}
         onClose={() => setActiveModal(null)}
         title="Expenses"
-        subtitle={`Total: ${formatCurrency(totalExpenses, currency)}`}
+        subtitle={`${currentMonthName}: ${formatCurrency(todayExpensesTotal, currency)} | Total: ${formatCurrency(totalExpenses, currency)}`}
       >
         <EditExpensesView financialData={financialData} onSave={onSave} onClose={() => setActiveModal(null)} />
       </Modal>
