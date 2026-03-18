@@ -67,44 +67,39 @@ export const EditAssetsView: React.FC<Props> = ({ financialData, onSave, onClose
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {assets.map((asset, index) => (
+            {assets.map((asset) => (
               <button
                 key={asset.id}
                 onClick={() => setEditingId(asset.id)}
                 className="relative bg-white rounded-2xl p-5 border border-primary-100 hover:border-primary-300 hover:shadow-md transition-all text-left group overflow-hidden"
               >
-                {/* Index Badge */}
-                <div className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center text-xs font-black">
-                  {index + 1}
+                {/* Edit Icon - Top Right */}
+                <div className="absolute top-3 right-3 p-2 text-primary-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
                 </div>
 
-                {/* Delete Button */}
+                {/* Card Content */}
+                <div className="pr-8">
+                  <p className="font-bold text-primary-900 truncate text-base">{asset.name || 'Unnamed Asset'}</p>
+                  <p className="text-xs text-primary-400 truncate mt-2">{asset.category}</p>
+                  <p className="text-sm font-bold text-primary-600 mt-3">{asset.value ? `$${asset.value.toFixed(2)}` : 'No value'}</p>
+                </div>
+
+                {/* Delete Button - Bottom Right */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     removeEntry(asset.id);
                   }}
-                  className="absolute top-3 left-3 p-2 text-primary-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                  className="absolute bottom-3 right-3 p-2 text-primary-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                   title="Delete asset"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                   </svg>
                 </button>
-
-                {/* Card Content */}
-                <div className="pr-8 pt-2">
-                  <p className="font-bold text-primary-900 truncate text-base">{asset.name || 'Unnamed Asset'}</p>
-                  <p className="text-xs text-primary-400 truncate mt-2">{asset.category}</p>
-                  <p className="text-sm font-bold text-primary-600 mt-3">{asset.value ? `$${asset.value.toFixed(2)}` : 'No value'}</p>
-                </div>
-
-                {/* Edit Indicator */}
-                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg className="w-4 h-4 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
-                </div>
               </button>
             ))}
           </div>
