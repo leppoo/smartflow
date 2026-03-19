@@ -9,7 +9,8 @@ import { ExpensesHistoryView } from './ExpensesHistoryView';
 const deleteButtonStyle = `
   .delete-icon-btn {
     transition: box-shadow 300ms ease-in-out, color 300ms ease-in-out, transform 300ms ease-in-out, opacity 300ms ease-in-out;
-    border-right: none;
+    position: relative;
+    overflow: visible;
   }
   .delete-icon-btn:hover {
     box-shadow: 0 0 40px 40px rgba(239, 68, 68, 0.8) inset;
@@ -41,6 +42,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
   const [showExpenseSavedMessage, setShowExpenseSavedMessage] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmType>(null);
+  const [pendingDeleteAssetId, setPendingDeleteAssetId] = useState<string | null>(null);
 
   const currency = financialData.currency;
 
@@ -127,6 +129,7 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
       return updated;
     });
     if (editingAssetId === id) setEditingAssetId(null);
+    setPendingDeleteAssetId(null);
   };
 
   const saveAssets = () => {
@@ -319,34 +322,67 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
             ) : (
               <div className="space-y-2">
                 {assets.map((asset) => (
-                  <div key={asset.id} className="relative bg-primary-50/50 rounded-xl py-4 px-4 pr-0 border border-primary-100 hover:border-primary-300 hover:shadow-md transition-all flex items-center gap-2 group overflow-hidden">
-                    {/* Clickable Row - Left/Center */}
-                    <button
-                      onClick={() => setEditingAssetId(asset.id)}
-                      className="flex-1 text-left"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-bold text-primary-900 truncate">{asset.name || 'Unnamed Asset'}</p>
-                        <p className="text-xs text-primary-400">{asset.category}</p>
+                  <div key={asset.id} className="relative bg-primary-50/50 rounded-xl py-4 px-4 border border-primary-100 hover:border-primary-300 hover:shadow-md transition-all overflow-hidden">
+                    {pendingDeleteAssetId === asset.id ? (
+                      <div className="space-y-4">
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                          <p className="text-sm font-bold text-red-800 mb-2">Delete Asset</p>
+                          <p className="text-xs text-red-700 mb-3">
+                            Are you sure you want to delete <span className="font-bold">{asset.name || 'Unnamed Asset'}</span>? This action cannot be undone.
+                          </p>
+                        </div>
+                        <div className="flex gap-3 justify-end">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPendingDeleteAssetId(null);
+                            }}
+                            className="px-4 py-2 bg-primary-200 text-primary-600 text-sm font-bold rounded-lg hover:bg-primary-300 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeAsset(asset.id);
+                            }}
+                            className="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    </button>
+                    ) : (
+                      <div className="flex items-center gap-2 group">
+                        {/* Clickable Row - Left/Center */}
+                        <button
+                          onClick={() => setEditingAssetId(asset.id)}
+                          className="flex-1 text-left"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-bold text-primary-900 truncate">{asset.name || 'Unnamed Asset'}</p>
+                            <p className="text-xs text-primary-400">{asset.category}</p>
+                          </div>
+                        </button>
 
-                    {/* Amount - Center */}
-                    <p className="text-lg font-black text-primary-700 whitespace-nowrap">{formatCurrency(asset.value || 0, currency)}</p>
+                        {/* Amount - Center */}
+                        <p className="text-lg font-black text-primary-700 whitespace-nowrap">{formatCurrency(asset.value || 0, currency)}</p>
 
-                    {/* Action Icon - Slides In From Right on Hover */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteConfirm({ type: 'asset', id: asset.id, name: asset.name || 'Unnamed Asset' });
-                      }}
-                      className="delete-icon-btn p-3 text-red-400 border border-red-400 bg-transparent rounded-l-lg transform group-hover:translate-x-0 group-hover:opacity-100 translate-x-full opacity-0"
-                      title="Delete asset"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                      </svg>
-                    </button>
+                        {/* Delete Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPendingDeleteAssetId(asset.id);
+                          }}
+                          className="delete-icon-btn p-3 text-red-400 border border-red-400 bg-transparent rounded-lg transform group-hover:translate-x-0 group-hover:opacity-100 translate-x-full opacity-0"
+                          title="Delete asset"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                          </svg>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
