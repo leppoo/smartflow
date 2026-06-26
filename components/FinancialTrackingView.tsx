@@ -198,7 +198,12 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
         {/* Financial Overview Hero */}
         <section className="bg-gradient-to-br from-primary-600 to-accent-700 rounded-[2.5rem] p-8 sm:p-11 text-white relative overflow-hidden">
           <div className="relative z-10">
-            <h2 className="text-2xl font-black mb-6 tracking-tight">Financial Overview</h2>
+            <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1 mb-6">
+              <h2 className="text-2xl font-black tracking-tight">Financial Overview</h2>
+              <span className="font-mono text-sm sm:text-base font-semibold text-white/80 bg-white/10 px-2 py-0.5 rounded-md border border-white/20">
+                {new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+              </span>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 border-2 border-white/40 ring-1 ring-white/20 min-w-0">
                 <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-1">Savings / Bank Balances</p>
