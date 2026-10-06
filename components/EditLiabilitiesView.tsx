@@ -185,6 +185,16 @@ export const EditLiabilitiesView: React.FC<Props> = ({ financialData, onSave, on
               <p className="text-[10px] font-bold text-primary-300 uppercase tracking-wider">Remaining</p>
               <p className="text-lg font-bold text-primary-600">${remaining.toFixed(2)}</p>
             </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-primary-300 uppercase tracking-wider">Remark</label>
+              <textarea
+                value={editingEntry.remark || ''}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateEntry(editingEntry.id, 'remark', e.target.value)}
+                placeholder="e.g. Monthly installment RM500, due on the 5th"
+                rows={3}
+                className="w-full rounded-xl border border-primary-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+              />
+            </div>
           </div>
 
           <div className="p-6 bg-primary-50 border-t border-primary-100 flex justify-end gap-3">

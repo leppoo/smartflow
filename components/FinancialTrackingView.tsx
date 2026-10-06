@@ -535,6 +535,12 @@ export const FinancialTrackingView: React.FC<Props> = ({ financialData, invoices
                         <div className="bg-primary-500 h-1.5 rounded-full transition-all" style={{ width: `${paidPercent}%` }}></div>
                       </div>
                       <p className="text-[10px] text-primary-400 mt-1">{paidPercent}% paid</p>
+                      {liability.remark && (
+                        <div className="mt-3 pt-3 border-t border-primary-100">
+                          <p className="text-[10px] font-bold text-primary-300 uppercase tracking-wider mb-1">Remark</p>
+                          <p className="text-xs text-primary-600 whitespace-pre-wrap">{liability.remark}</p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
